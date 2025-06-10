@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Heart, Menu, X, Phone, Mail } from "lucide-react"
+import Link from "next/link"
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -23,7 +24,7 @@ export function Header() {
             </div>
           </div>
           <div className="text-gray-600">
-            <span className="text-pink-600 font-medium">Code Her Care 2024</span> - Transforming Women's Health
+            <span className="text-pink-600 font-medium">Code Her Care 2025</span> - Transforming Women's Health
           </div>
         </div>
 
@@ -53,9 +54,9 @@ export function Header() {
             <a href="#demo" className="text-gray-700 hover:text-pink-600 font-medium transition-colors">
               Live Demo
             </a>
-            <a href="#dashboard" className="text-gray-700 hover:text-pink-600 font-medium transition-colors">
+            <Link href="/dashboard" className="text-gray-700 hover:text-pink-600 font-medium transition-colors">
               Dashboard
-            </a>
+            </Link>
             <a href="#team" className="text-gray-700 hover:text-pink-600 font-medium transition-colors">
               Team
             </a>
@@ -86,9 +87,9 @@ export function Header() {
               <a href="#demo" className="text-gray-700 hover:text-pink-600 font-medium transition-colors py-2">
                 Live Demo
               </a>
-              <a href="#dashboard" className="text-gray-700 hover:text-pink-600 font-medium transition-colors py-2">
+              <Link href="/dashboard" className="text-gray-700 hover:text-pink-600 font-medium transition-colors py-2">
                 Dashboard
-              </a>
+              </Link>
               <a href="#team" className="text-gray-700 hover:text-pink-600 font-medium transition-colors py-2">
                 Team
               </a>
