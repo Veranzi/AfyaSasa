@@ -51,18 +51,20 @@ export function Header() {
             <a href="#features" className="text-gray-700 hover:text-pink-600 font-medium transition-colors">
               Features
             </a>
-            <a href="#demo" className="text-gray-700 hover:text-pink-600 font-medium transition-colors">
+            <Link href="/demo" className="text-gray-700 hover:text-pink-600 font-medium transition-colors">
               Live Demo
-            </a>
+            </Link>
             <Link href="/dashboard" className="text-gray-700 hover:text-pink-600 font-medium transition-colors">
               Dashboard
             </Link>
             <a href="#team" className="text-gray-700 hover:text-pink-600 font-medium transition-colors">
               Team
             </a>
-            <Button className="bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700">
-              Get Started
-            </Button>
+            <Link href="/demo">
+              <Button className="bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700">
+                Get Started
+              </Button>
+            </Link>
           </nav>
 
           {/* Mobile Menu Button */}
@@ -84,18 +86,20 @@ export function Header() {
               <a href="#features" className="text-gray-700 hover:text-pink-600 font-medium transition-colors py-2">
                 Features
               </a>
-              <a href="#demo" className="text-gray-700 hover:text-pink-600 font-medium transition-colors py-2">
+              <Link href="/demo" className="text-gray-700 hover:text-pink-600 font-medium transition-colors py-2">
                 Live Demo
-              </a>
+              </Link>
               <Link href="/dashboard" className="text-gray-700 hover:text-pink-600 font-medium transition-colors py-2">
                 Dashboard
               </Link>
               <a href="#team" className="text-gray-700 hover:text-pink-600 font-medium transition-colors py-2">
                 Team
               </a>
-              <Button className="bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 mt-4">
-                Get Started
-              </Button>
+              <Link href="/demo">
+                <Button className="bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 mt-4">
+                  Get Started
+                </Button>
+              </Link>
             </nav>
           </div>
         )}

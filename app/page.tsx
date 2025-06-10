@@ -2,7 +2,6 @@ import { Header } from "@/components/header"
 import { Hero } from "@/components/hero"
 import { Features } from "@/components/features"
 import { Dashboard } from "@/components/dashboard"
-import { PredictionDemo } from "@/components/prediction-demo"
 import { Stats } from "@/components/stats"
 import { Team } from "@/components/team"
 import { Footer } from "@/components/footer"
@@ -17,7 +16,6 @@ export default function Home() {
         <Hero />
         <Stats />
         <Features />
-        <PredictionDemo />
         <Dashboard />
         <Team />
       </div>
