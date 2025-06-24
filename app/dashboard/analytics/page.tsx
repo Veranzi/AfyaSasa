@@ -10,6 +10,14 @@ import { ResponsiveContainer, LineChart, XAxis, YAxis, Tooltip, Line, PieChart, 
 
 const OVARIAN_DATA_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSOrLbxUb6jmar3LIp2tFGHHimYL7Tl6zZTRNqJohoWBaq7sk0UHkxTKPwknP3muI5rx2kE6PwSyrKk/pub?gid=0&single=true&output=csv";
 
+const COLORS = ["#82ca9d", "#8884d8", "#ff7f7f", "#ffc658", "#a4de6c", "#d0ed57"];
+
+// Define types for risk and age group keys
+const RISK_LEVELS = ["Low", "Medium", "High", "Moderate"] as const;
+type RiskLevel = typeof RISK_LEVELS[number];
+const AGE_GROUPS = ["<30", "30-39", "40-49", "50+"] as const;
+type AgeGroup = typeof AGE_GROUPS[number];
+
 function getMonthName(dateString: string) {
   if (!dateString) return "";
   const d = new Date(dateString);
@@ -48,14 +56,15 @@ export default function AnalyticsPage() {
     if (rec["Recommended Management"] === "Referral") return "High";
     if (rec["Recommended Management"] === "Surgery") return "Medium";
     if (rec["Recommended Management"] === "Medication") return "Low";
+    if (rec["Recommended Management"] === "Observation") return "Moderate";
     return "-";
   }
 
   // Risk distribution
-  const riskCounts = { High: 0, Medium: 0, Low: 0 };
+  const riskCounts = { Low: 0, Medium: 0, High: 0, Moderate: 0 };
   patients.forEach(p => {
     const risk = getRisk(p);
-    if (risk === "High" || risk === "Medium" || risk === "Low") riskCounts[risk]++;
+    if (risk === "High" || risk === "Medium" || risk === "Low" || risk === "Moderate") riskCounts[risk]++;
   });
   const riskDistribution = [
     { name: "Low Risk", value: riskCounts.Low },
@@ -73,16 +82,16 @@ export default function AnalyticsPage() {
     if (n < 50) return '40-49';
     return '50+';
   }
-  const ageRiskMap: Record<string, { High: number; Medium: number; Low: number }> = {
-    '<30': { High: 0, Medium: 0, Low: 0 },
-    '30-39': { High: 0, Medium: 0, Low: 0 },
-    '40-49': { High: 0, Medium: 0, Low: 0 },
-    '50+': { High: 0, Medium: 0, Low: 0 },
+  const ageRiskMap: Record<string, { High: number; Medium: number; Low: number; Moderate: number }> = {
+    '<30': { High: 0, Medium: 0, Low: 0, Moderate: 0 },
+    '30-39': { High: 0, Medium: 0, Low: 0, Moderate: 0 },
+    '40-49': { High: 0, Medium: 0, Low: 0, Moderate: 0 },
+    '50+': { High: 0, Medium: 0, Low: 0, Moderate: 0 },
   };
   patients.forEach(p => {
     const group = getAgeGroup(p['Age']);
     const risk = getRisk(p);
-    if (risk === 'High' || risk === 'Medium' || risk === 'Low') {
+    if (risk === 'High' || risk === 'Medium' || risk === 'Low' || risk === 'Moderate') {
       ageRiskMap[group][risk]++;
     }
   });
@@ -160,18 +169,20 @@ export default function AnalyticsPage() {
 
   // Process age distribution
   const processAgeDistribution = (data: any[]) => {
-    const ageGroups = {
-      '<30': { Low: 0, Medium: 0, High: 0 },
-      '30-39': { Low: 0, Medium: 0, High: 0 },
-      '40-49': { Low: 0, Medium: 0, High: 0 },
-      '50+': { Low: 0, Medium: 0, High: 0 }
+    const ageGroups: Record<AgeGroup, Record<RiskLevel, number>> = {
+      '<30': { Low: 0, Medium: 0, High: 0, Moderate: 0 },
+      '30-39': { Low: 0, Medium: 0, High: 0, Moderate: 0 },
+      '40-49': { Low: 0, Medium: 0, High: 0, Moderate: 0 },
+      '50+': { Low: 0, Medium: 0, High: 0, Moderate: 0 }
     };
 
     data.forEach(p => {
       const age = parseInt(p['Age']) || 0;
       const risk = getRisk(p);
-      let ageGroup = age < 30 ? '<30' : age < 40 ? '30-39' : age < 50 ? '40-49' : '50+';
-      ageGroups[ageGroup][risk]++;
+      let ageGroup: AgeGroup = age < 30 ? '<30' : age < 40 ? '30-39' : age < 50 ? '40-49' : '50+';
+      if (RISK_LEVELS.includes(risk as RiskLevel)) {
+        ageGroups[ageGroup][risk as RiskLevel]++;
+      }
     });
 
     return Object.entries(ageGroups).map(([name, values]) => ({
@@ -182,10 +193,12 @@ export default function AnalyticsPage() {
 
   // Process risk distribution
   const processRiskDistribution = (data: any[]) => {
-    const riskCounts = { Low: 0, Medium: 0, High: 0 };
+    const riskCounts: Record<RiskLevel, number> = { Low: 0, Medium: 0, High: 0, Moderate: 0 };
     data.forEach(p => {
       const risk = getRisk(p);
-      riskCounts[risk]++;
+      if (RISK_LEVELS.includes(risk as RiskLevel)) {
+        riskCounts[risk as RiskLevel]++;
+      }
     });
 
     return Object.entries(riskCounts).map(([name, value]) => ({
@@ -278,17 +291,125 @@ export default function AnalyticsPage() {
         <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
           <Card className="col-span-1">
             <CardHeader>
-              <CardTitle>Monthly Patient Growth</CardTitle>
+              <CardTitle>Personalized Recommendations</CardTitle>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={chartData.monthlyGrowthData}>
-                  <XAxis dataKey="date" />
-                  <YAxis />
-                  <Tooltip />
-                  <Line type="monotone" dataKey="count" stroke="#8884d8" />
-                </LineChart>
-              </ResponsiveContainer>
+              <div className="space-y-4">
+                {patients.length === 0 ? (
+                  <div className="text-center text-gray-500">No recommendations available.</div>
+                ) : (
+                  <>
+                    {/* Example: Highlight patients with large cysts */}
+                    {(() => {
+                      const largeCysts = patients.filter(p => {
+                        const size = parseFloat(p["Size"] || "0");
+                        return size >= 5;
+                      });
+                      if (largeCysts.length > 0) {
+                        return (
+                          <div className="p-3 bg-yellow-50 rounded-lg border border-yellow-200 flex items-center gap-3">
+                            <AlertTriangle className="h-5 w-5 text-yellow-600" />
+                            <div>
+                              <div className="font-semibold text-yellow-800">{largeCysts.length} patient(s) have cysts ≥ 5cm</div>
+                              <div className="text-xs text-yellow-700">Recommend urgent follow-up and imaging for these cases.</div>
+                            </div>
+                          </div>
+                        );
+                      }
+                      return null;
+                    })()}
+                    {/* Example: Suggest routine follow-up for moderate cysts */}
+                    {(() => {
+                      const moderateCysts = patients.filter(p => {
+                        const size = parseFloat(p["Size"] || "0");
+                        return size > 2 && size < 5;
+                      });
+                      if (moderateCysts.length > 0) {
+                        return (
+                          <div className="p-3 bg-blue-50 rounded-lg border border-blue-200 flex items-center gap-3">
+                            <Activity className="h-5 w-5 text-blue-600" />
+                            <div>
+                              <div className="font-semibold text-blue-800">{moderateCysts.length} patient(s) have cysts 2-5cm</div>
+                              <div className="text-xs text-blue-700">Recommend routine follow-up in 3-6 months.</div>
+                            </div>
+                          </div>
+                        );
+                      }
+                      return null;
+                    })()}
+                    {/* Example: Reassure for small cysts */}
+                    {(() => {
+                      const smallCysts = patients.filter(p => {
+                        const size = parseFloat(p["Size"] || "0");
+                        return size > 0 && size <= 2;
+                      });
+                      if (smallCysts.length > 0) {
+                        return (
+                          <div className="p-3 bg-green-50 rounded-lg border border-green-200 flex items-center gap-3">
+                            <Users className="h-5 w-5 text-green-600" />
+                            <div>
+                              <div className="font-semibold text-green-800">{smallCysts.length} patient(s) have cysts ≤ 2cm</div>
+                              <div className="text-xs text-green-700">Most small cysts are benign. Routine care advised.</div>
+                            </div>
+                          </div>
+                        );
+                      }
+                      return null;
+                    })()}
+                    {/* Add region-based recommendations */}
+                    {(() => {
+                      // Find region with most high-risk cases
+                      const regionRiskMap: Record<string, number> = {};
+                      patients.forEach(p => {
+                        if (getRisk(p) === "High") {
+                          const region = p["Region"] || "Unknown";
+                          regionRiskMap[region] = (regionRiskMap[region] || 0) + 1;
+                        }
+                      });
+                      const sortedRegions = Object.entries(regionRiskMap).sort((a, b) => b[1] - a[1]);
+                      if (sortedRegions.length > 0 && sortedRegions[0][1] > 0) {
+                        const [topRegion, count] = sortedRegions[0];
+                        return (
+                          <div className="p-3 bg-rose-50 rounded-lg border border-rose-200 flex items-center gap-3">
+                            <AlertTriangle className="h-5 w-5 text-rose-600" />
+                            <div>
+                              <div className="font-semibold text-rose-800">{topRegion}: {count} high-risk case(s)</div>
+                              <div className="text-xs text-rose-700">Prioritize outreach and specialist support in this region.</div>
+                            </div>
+                          </div>
+                        );
+                      }
+                      return null;
+                    })()}
+                    {/* Region-based high-risk cases chart */}
+                    {(() => {
+                      // Prepare data for chart: [{ region, count }]
+                      const regionRiskMap: Record<string, number> = {};
+                      patients.forEach(p => {
+                        if (getRisk(p) === "High") {
+                          const region = p["Region"] || "Unknown";
+                          regionRiskMap[region] = (regionRiskMap[region] || 0) + 1;
+                        }
+                      });
+                      const chartData = Object.entries(regionRiskMap).map(([region, count]) => ({ region, count }));
+                      if (chartData.length === 0) return null;
+                      return (
+                        <div className="mt-6">
+                          <div className="font-semibold mb-2 text-sm text-gray-700">High-Risk Cases by Region</div>
+                          <ResponsiveContainer width="100%" height={220}>
+                            <BarChart data={chartData} layout="vertical" margin={{ left: 30, right: 20, top: 10, bottom: 10 }}>
+                              <XAxis type="number" allowDecimals={false} />
+                              <YAxis dataKey="region" type="category" width={100} />
+                              <Tooltip />
+                              <Bar dataKey="count" fill="#ef4444" name="High Risk Cases" />
+                            </BarChart>
+                          </ResponsiveContainer>
+                        </div>
+                      );
+                    })()}
+                  </>
+                )}
+              </div>
             </CardContent>
           </Card>
 
@@ -335,6 +456,7 @@ export default function AnalyticsPage() {
                 <Bar dataKey="Low" stackId="a" fill="#82ca9d" />
                 <Bar dataKey="Medium" stackId="a" fill="#8884d8" />
                 <Bar dataKey="High" stackId="a" fill="#ff7f7f" />
+                <Bar dataKey="Moderate" stackId="a" fill="#ffd966" />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>

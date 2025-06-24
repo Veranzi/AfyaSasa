@@ -31,6 +31,8 @@ export default function PatientsPage() {
       ? "Medium"
       : p["Recommended Management"] === "Medication"
       ? "Low"
+      : p["Recommended Management"] === "Observation"
+      ? "Moderate"
       : "-",
     status: p["Recommended Management"] || "-",
     nextVisit: p["Date of Exam"] || "-",
@@ -88,6 +90,7 @@ export default function PatientsPage() {
               <option value="">All</option>
               <option value="High">High</option>
               <option value="Medium">Medium</option>
+              <option value="Moderate">Moderate</option>
               <option value="Low">Low</option>
             </select>
           </div>
@@ -137,10 +140,12 @@ export default function PatientsPage() {
                 <div className="text-right">
                   <Badge
                     variant={
-                      patient.risk === "High" 
-                        ? "destructive" 
-                        : patient.risk === "Medium" 
-                        ? "default" 
+                      patient.risk === "High"
+                        ? "destructive"
+                        : patient.risk === "Medium"
+                        ? "default"
+                        : patient.risk === "Moderate"
+                        ? "outline"
                         : "secondary"
                     }
                     className="mb-1"

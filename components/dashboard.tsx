@@ -70,7 +70,9 @@ export function Dashboard({ initialTab = 'dashboard' }: DashboardProps) {
   const patients = (ovarianSheet || []).filter(p => p["Patient ID"]).map((p: PatientData) => ({
     name: p["Patient ID"] || "Unknown",
     age: p["Age"] || "-",
-    risk: p["Risk Level"] || "Unknown",
+    risk: p["Risk Level"] === "Observation"
+      ? "Moderate"
+      : p["Risk Level"] || "Unknown",
     date: p["Date"] ? new Date(p["Date"]).toLocaleDateString() : "-",
   }));
 
@@ -244,7 +246,13 @@ export function Dashboard({ initialTab = 'dashboard' }: DashboardProps) {
                       <div className="text-right">
                         <Badge
                           variant={
-                            patient.risk === "High" ? "destructive" : patient.risk === "Medium" ? "default" : "secondary"
+                            patient.risk === "High"
+                              ? "destructive"
+                              : patient.risk === "Moderate"
+                              ? "outline"
+                              : patient.risk === "Medium"
+                              ? "default"
+                              : "secondary"
                           }
                           className="mb-1"
                         >
