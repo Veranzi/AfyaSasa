@@ -1,80 +1,58 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+"use client";
+import { useGoogleSheet } from "@/hooks/useGoogleSheet";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Progress } from "@/components/ui/progress"
 import { Search, Plus, AlertTriangle, Package, ArrowUpRight } from "lucide-react"
+import { useState } from "react";
 
-const inventory = [
-  {
-    id: "I001",
-    item: "Ultrasound Gel",
-    stock: 85,
-    threshold: 20,
-    status: "good",
-    category: "Diagnostic Supplies",
-    lastRestock: "2024-03-15",
-    supplier: "MedSupply Co.",
-    location: "Storage Room A"
-  },
-  {
-    id: "I002",
-    item: "Contraceptive Pills",
-    stock: 12,
-    threshold: 15,
-    status: "low",
-    category: "Medications",
-    lastRestock: "2024-03-10",
-    supplier: "PharmaPlus",
-    location: "Pharmacy"
-  },
-  {
-    id: "I003",
-    item: "Pain Medication",
-    stock: 45,
-    threshold: 25,
-    status: "good",
-    category: "Medications",
-    lastRestock: "2024-03-20",
-    supplier: "PharmaPlus",
-    location: "Pharmacy"
-  },
-  {
-    id: "I004",
-    item: "Surgical Supplies",
-    stock: 8,
-    threshold: 10,
-    status: "critical",
-    category: "Surgical Equipment",
-    lastRestock: "2024-03-05",
-    supplier: "SurgiTech",
-    location: "Storage Room B"
-  },
-  {
-    id: "I005",
-    item: "Disposable Gloves",
-    stock: 150,
-    threshold: 50,
-    status: "good",
-    category: "Safety Equipment",
-    lastRestock: "2024-03-18",
-    supplier: "MedSupply Co.",
-    location: "Storage Room A"
-  },
-  {
-    id: "I006",
-    item: "Antibiotics",
-    stock: 18,
-    threshold: 20,
-    status: "low",
-    category: "Medications",
-    lastRestock: "2024-03-12",
-    supplier: "PharmaPlus",
-    location: "Pharmacy"
-  }
-]
+const INVENTORY_DATA_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSOrLbxUb6jmar3LIp2tFGHHimYL7Tl6zZTRNqJohoWBaq7sk0UHkxTKPwknP3muI5rx2kE6PwSyrKk/pub?gid=1858485866&single=true&output=csv";
 
 export default function InventoryPage() {
+  const inventorySheet = useGoogleSheet(INVENTORY_DATA_CSV);
+  const [showFilter, setShowFilter] = useState(false);
+  const [facilityFilter, setFacilityFilter] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
+
+  if (inventorySheet.loading) return <div>Loading...</div>;
+  if (inventorySheet.error) return <div>Error loading data</div>;
+
+  // Map inventory_data for display
+  const inventory = (inventorySheet.data || []).filter(i => i["Item"]).map((i, idx) => ({
+    id: i["ID"] || `I${idx+1}`,
+    item: i["Item"] || "Unknown",
+    stock: Number(i["Available Stock"] || 0),
+    threshold: Number(i["Threshold"] || 10),
+    status: Number(i["Available Stock"] || 0) <= Number(i["Threshold"] || 10)
+      ? (Number(i["Available Stock"] || 0) <= 5 ? "critical" : "low")
+      : "good",
+    category: i["Category"] || "-",
+    lastRestock: i["Last Restock"] || "-",
+    supplier: i["Supplier"] || "-",
+    location: i["Facility"] || "-",
+    cost: Number(i["Cost (KES)"] || 0),
+  }));
+
+  const totalItems = inventory.length;
+  const lowStockItems = inventory.filter(item => item.status === "low").length;
+  const criticalItems = inventory.filter(item => item.status === "critical").length;
+  // Placeholder for restock orders and value
+  const restockOrders = inventory.filter(item => item.status !== "good").length;
+  const inventoryValue = inventory.reduce((sum, item) => sum + (item.cost * item.stock || 0), 0);
+
+  // Get unique options for filters
+  const facilities = Array.from(new Set((inventorySheet.data || []).map(i => i["Facility"])) ).filter(Boolean);
+  const categories = Array.from(new Set((inventorySheet.data || []).map(i => i["Category"])) ).filter(Boolean);
+
+  // Filter inventory
+  const filteredInventory = inventory.filter(item => {
+    const matchesFacility = !facilityFilter || ((inventorySheet.data || []).find(i => (i["Item"] === item.item && i["Facility"] === facilityFilter)));
+    const matchesCategory = !categoryFilter || item.category === categoryFilter;
+    return matchesFacility && matchesCategory;
+  });
+
   return (
     <div className="flex-1 space-y-4 p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">
@@ -91,9 +69,9 @@ export default function InventoryPage() {
             <Package className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">156</div>
+            <div className="text-2xl font-bold">{totalItems}</div>
             <p className="text-xs text-muted-foreground">
-              <span className="text-green-600">+8</span> new items this month
+              <span className="text-green-600">Live</span>
             </p>
           </CardContent>
         </Card>
@@ -103,9 +81,9 @@ export default function InventoryPage() {
             <AlertTriangle className="h-4 w-4 text-yellow-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">4</div>
+            <div className="text-2xl font-bold">{lowStockItems}</div>
             <p className="text-xs text-muted-foreground">
-              <span className="text-red-600">2</span> critical items
+              <span className="text-red-600">{criticalItems}</span> critical items
             </p>
           </CardContent>
         </Card>
@@ -115,9 +93,9 @@ export default function InventoryPage() {
             <ArrowUpRight className="h-4 w-4 text-purple-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">12</div>
+            <div className="text-2xl font-bold">{restockOrders}</div>
             <p className="text-xs text-muted-foreground">
-              <span className="text-green-600">+3</span> pending orders
+              <span className="text-green-600">Live</span> pending orders
             </p>
           </CardContent>
         </Card>
@@ -127,9 +105,9 @@ export default function InventoryPage() {
             <Package className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$24.5K</div>
+            <div className="text-2xl font-bold">KES {inventoryValue.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">
-              <span className="text-green-600">+12%</span> from last month
+              <span className="text-green-600">Live</span> value
             </p>
           </CardContent>
         </Card>
@@ -140,8 +118,38 @@ export default function InventoryPage() {
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
           <Input placeholder="Search inventory..." className="pl-8" />
         </div>
-        <Button variant="outline">Filter by Category</Button>
+        <Button variant="outline" onClick={() => setShowFilter(f => !f)}>Filter</Button>
       </div>
+
+      {showFilter && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+          <div>
+            <label className="block text-xs font-semibold mb-1">Facility</label>
+            <select 
+              className="w-full p-2 border rounded-md"
+              value={facilityFilter}
+              onChange={e => setFacilityFilter(e.target.value)}
+            >
+              <option value="">All Facilities</option>
+              {facilities.map(f => <option key={f} value={f}>{f}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-semibold mb-1">Category</label>
+            <select 
+              className="w-full p-2 border rounded-md"
+              value={categoryFilter}
+              onChange={e => setCategoryFilter(e.target.value)}
+            >
+              <option value="">All Categories</option>
+              {categories.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
+          <div className="flex items-end">
+            <Button variant="secondary" onClick={() => { setFacilityFilter(""); setCategoryFilter(""); }}>Clear Filters</Button>
+          </div>
+        </div>
+      )}
 
       <Card>
         <CardHeader>
@@ -149,8 +157,8 @@ export default function InventoryPage() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {inventory.map((item) => (
-              <div key={item.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+            {filteredInventory.map((item, index) => (
+              <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-rose-500 rounded-full flex items-center justify-center text-white">
                     <Package className="h-5 w-5" />
@@ -180,6 +188,7 @@ export default function InventoryPage() {
                   </div>
                   <div className="text-xs text-gray-500">Threshold: {item.threshold} units</div>
                   <div className="text-xs text-gray-500">Last Restock: {item.lastRestock}</div>
+                  <div className="text-xs text-gray-500">Cost: {item.cost.toLocaleString()} KES</div>
                 </div>
               </div>
             ))}

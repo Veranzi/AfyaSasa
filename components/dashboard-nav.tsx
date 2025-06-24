@@ -11,6 +11,7 @@ import {
   Settings,
   Bell,
   FileText,
+  Syringe,
 } from "lucide-react"
 
 const routes = [
@@ -37,6 +38,12 @@ const routes = [
     icon: Package,
     href: "/dashboard/inventory",
     color: "text-orange-700",
+  },
+  {
+    label: "Treatment",
+    icon: Syringe,
+    href: "/dashboard/treatment",
+    color: "text-indigo-600",
   },
   {
     label: "Reports",

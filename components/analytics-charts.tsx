@@ -12,6 +12,8 @@ import {
   PieChart,
   Pie,
   Cell,
+  BarChart,
+  Bar,
 } from "recharts"
 
 const COLORS = ["#22c55e", "#eab308", "#ef4444"]
@@ -27,9 +29,18 @@ interface AnalyticsChartsProps {
     name: string
     value: number
   }>
+  ageRiskDistribution: Array<{
+    ageGroup: string
+    High: number
+    Medium: number
+    Low: number
+  }>
+  preUltrasoundData: Array<any>
+  postUltrasoundData: Array<any>
+  ultrasoundFeatures: string[]
 }
 
-export function AnalyticsCharts({ monthlyData, riskDistribution }: AnalyticsChartsProps) {
+export function AnalyticsCharts({ monthlyData, riskDistribution, ageRiskDistribution, preUltrasoundData, postUltrasoundData, ultrasoundFeatures }: AnalyticsChartsProps) {
   return (
     <div className="grid gap-4 md:grid-cols-2">
       <Card className="col-span-2">
@@ -64,6 +75,68 @@ export function AnalyticsCharts({ monthlyData, riskDistribution }: AnalyticsChar
         </CardContent>
       </Card>
 
+      <Card className="col-span-2">
+        <CardHeader>
+          <CardTitle>Pre-menopausal: Ultrasound Features by Region</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[350px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={preUltrasoundData}
+                margin={{ top: 20, right: 30, left: 0, bottom: 5 }}
+                barGap={8}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="region" interval={0} angle={-30} textAnchor="end" height={60} />
+                <YAxis allowDecimals={false} />
+                <Tooltip />
+                {ultrasoundFeatures.map((feature, idx) => (
+                  <Bar
+                    key={feature}
+                    dataKey={feature}
+                    stackId="a"
+                    fill={COLORS[idx % COLORS.length]}
+                    name={feature}
+                  />
+                ))}
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="col-span-2">
+        <CardHeader>
+          <CardTitle>Post-menopausal: Ultrasound Features by Region</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[350px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={postUltrasoundData}
+                margin={{ top: 20, right: 30, left: 0, bottom: 5 }}
+                barGap={8}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="region" interval={0} angle={-30} textAnchor="end" height={60} />
+                <YAxis allowDecimals={false} />
+                <Tooltip />
+                {ultrasoundFeatures.map((feature, idx) => (
+                  <Bar
+                    key={feature}
+                    dataKey={feature}
+                    stackId="a"
+                    fill={COLORS[idx % COLORS.length]}
+                    name={feature}
+                  />
+                ))}
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <CardTitle>Risk Distribution</CardTitle>
@@ -88,6 +161,27 @@ export function AnalyticsCharts({ monthlyData, riskDistribution }: AnalyticsChar
                 </Pie>
                 <Tooltip />
               </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Age Distribution by Risk Level</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[350px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={ageRiskDistribution} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="ageGroup" />
+                <YAxis allowDecimals={false} />
+                <Tooltip />
+                <Bar dataKey="High" stackId="a" fill="#ef4444" name="High Risk" />
+                <Bar dataKey="Medium" stackId="a" fill="#eab308" name="Medium Risk" />
+                <Bar dataKey="Low" stackId="a" fill="#22c55e" name="Low Risk" />
+              </BarChart>
             </ResponsiveContainer>
           </div>
         </CardContent>
