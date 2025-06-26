@@ -5,18 +5,30 @@ export default function LLMRecommendationDemo() {
   const [question, setQuestion] = useState("");
   const [recommendation, setRecommendation] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setRecommendation("");
-    const res = await fetch("http://localhost:8000/api/llm-recommendation", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ context, question }),
-    });
-    const data = await res.json();
-    setRecommendation(data.recommendation);
+    setError("");
+    try {
+      const res = await fetch("http://localhost:5000/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contents: context + "\n" + question }),
+      });
+      const data = await res.json();
+      if (data.response) {
+        setRecommendation(data.response);
+      } else if (data.error) {
+        setError(data.error);
+      } else {
+        setError("No response from LLM.");
+      }
+    } catch (err) {
+      setError("Network or server error.");
+    }
     setLoading(false);
   };
 
@@ -52,6 +64,9 @@ export default function LLMRecommendationDemo() {
           {loading ? "Getting Recommendation..." : "Get Recommendation"}
         </button>
       </form>
+      {error && (
+        <div className="mt-4 p-3 bg-red-100 text-red-700 rounded">{error}</div>
+      )}
       {recommendation && (
         <div className="mt-6 p-4 bg-gray-100 rounded">
           <h3 className="font-semibold mb-2">LLM Recommendation:</h3>

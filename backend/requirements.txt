@@ -1,4 +1,7 @@
 fastapi
 requests
 uvicorn
-python-dotenv 
+python-dotenv
+Flask
+google-generativeai
+flask-cors 

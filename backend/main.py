@@ -4,6 +4,7 @@ import requests
 import os
 from dotenv import load_dotenv
 import genai
+from fastapi.responses import JSONResponse
 
 load_dotenv()
 
@@ -42,6 +43,9 @@ async def llm_recommendation(request: Request):
 
     prompt = f"Based on the following data:\n{context}\n\nQuestion: {question}"
 
-    model = genai.GenerativeModel("gemini-pro")
-    response = model.generate_content(prompt)
-    return {"recommendation": response.text} 
+    try:
+        model = genai.GenerativeModel("gemini-pro")
+        response = model.generate_content(prompt)
+        return {"recommendation": response.text}
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"recommendation": f"Error: {str(e)}"}) 
