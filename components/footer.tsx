@@ -99,12 +99,6 @@ export function Footer() {
                   Dashboard
                 </a>
               </li>
-              <li>
-                <a href="#team" className="text-gray-300 hover:text-pink-300 transition-colors flex items-center gap-2">
-                  <span className="w-1 h-1 bg-pink-400 rounded-full"></span>
-                  Our Team
-                </a>
-              </li>
             </ul>
           </div>
 
