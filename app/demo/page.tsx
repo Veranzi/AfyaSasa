@@ -1,7 +1,6 @@
 'use client'
 
 import { Header } from "@/components/header"
-import { Footer } from "@/components/footer"
 import { PredictionDemo } from "@/components/prediction-demo"
 
 export default function DemoPage() {
@@ -11,7 +10,6 @@ export default function DemoPage() {
       <div className="pt-24">
         <PredictionDemo />
       </div>
-      <Footer />
     </div>
   )
 } 
