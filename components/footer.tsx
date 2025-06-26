@@ -48,7 +48,7 @@ export function Footer() {
             <Award className="h-6 w-6 text-yellow-400" />
             <div className="text-center">
               <div className="text-xl font-bold text-pink-300">Code Her Care 2025</div>
-              <div className="text-sm text-purple-200">Track 2: Ovarian Cyst Prediction</div>
+              <div className="text-sm text-purple-200">Ovarian Cyst Prediction</div>
             </div>
           </div>
 

@@ -4,9 +4,25 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Heart, Menu, X, Phone, Mail } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const router = useRouter();
+
+  // Helper for smooth scrolling to section
+  const handleSectionNav = (sectionId: string) => {
+    if (typeof window !== "undefined") {
+      if (window.location.pathname === "/") {
+        const el = document.getElementById(sectionId)
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth" })
+        }
+      } else {
+        router.push(`/#${sectionId}`)
+      }
+    }
+  }
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-pink-100">
@@ -45,12 +61,14 @@ export function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-8">
-            <a href="#home" className="text-gray-700 hover:text-pink-600 font-medium transition-colors">
+            <button onClick={() => handleSectionNav("home")}
+              className="text-gray-700 hover:text-pink-600 font-medium transition-colors bg-transparent border-0 cursor-pointer">
               Home
-            </a>
-            <a href="#features" className="text-gray-700 hover:text-pink-600 font-medium transition-colors">
+            </button>
+            <button onClick={() => handleSectionNav("features")}
+              className="text-gray-700 hover:text-pink-600 font-medium transition-colors bg-transparent border-0 cursor-pointer">
               Features
-            </a>
+            </button>
             <Link href="/demo" className="text-gray-700 hover:text-pink-600 font-medium transition-colors">
               Live Demo
             </Link>
@@ -80,12 +98,14 @@ export function Header() {
         {isMenuOpen && (
           <div className="lg:hidden py-4 border-t border-pink-50">
             <nav className="flex flex-col gap-4">
-              <a href="#home" className="text-gray-700 hover:text-pink-600 font-medium transition-colors py-2">
+              <button onClick={() => { setIsMenuOpen(false); handleSectionNav("home") }}
+                className="text-gray-700 hover:text-pink-600 font-medium transition-colors py-2 bg-transparent border-0 text-left cursor-pointer">
                 Home
-              </a>
-              <a href="#features" className="text-gray-700 hover:text-pink-600 font-medium transition-colors py-2">
+              </button>
+              <button onClick={() => { setIsMenuOpen(false); handleSectionNav("features") }}
+                className="text-gray-700 hover:text-pink-600 font-medium transition-colors py-2 bg-transparent border-0 text-left cursor-pointer">
                 Features
-              </a>
+              </button>
               <Link href="/demo" className="text-gray-700 hover:text-pink-600 font-medium transition-colors py-2">
                 Live Demo
               </Link>
