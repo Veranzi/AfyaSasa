@@ -143,184 +143,138 @@ export function Dashboard({ initialTab = 'dashboard' }: DashboardProps) {
   return (
     <section className="py-20 bg-gray-50">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">Healthcare Provider Dashboard</h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Real-time insights for healthcare providers managing ovarian cyst patients, inventory, and care
-            coordination.
-          </p>
-        </div>
-
         {activeTab === 'dashboard' && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-            {/* Key Metrics */}
-            <div className="lg:col-span-3">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                <Card className="shadow-lg">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-gray-600">Active Patients</p>
-                        <p className="text-3xl font-bold text-gray-900">{patients.length}</p>
+          <>
+            <div className="mb-8 text-center">
+              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-1">Dashboard</h1>
+              <p className="text-gray-500 text-base md:text-lg">Overview of ovarian cyst prediction and care metrics</p>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+              {/* Key Metrics */}
+              <div className="lg:col-span-3">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                  <Card className="shadow-lg">
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-gray-600">Active Patients</p>
+                          <p className="text-3xl font-bold text-gray-900">{patients.length}</p>
+                        </div>
+                        <Users className="h-8 w-8 text-blue-600" />
                       </div>
-                      <Users className="h-8 w-8 text-blue-600" />
-                    </div>
-                    <div className="mt-4 flex items-center text-sm">
-                      <TrendingUp className="h-4 w-4 text-green-600 mr-1" />
-                      <span className="text-green-600">Live data</span>
-                    </div>
-                  </CardContent>
-                </Card>
+                      <div className="mt-4 flex items-center text-sm">
+                        <TrendingUp className="h-4 w-4 text-green-600 mr-1" />
+                        <span className="text-green-600">Live data</span>
+                      </div>
+                    </CardContent>
+                  </Card>
 
-                <Card className="shadow-lg">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-gray-600">High Risk Cases</p>
-                        <p className="text-3xl font-bold text-gray-900">{patients.filter(p => p.risk === "High").length}</p>
+                  <Card className="shadow-lg">
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-gray-600">High Risk Cases</p>
+                          <p className="text-3xl font-bold text-gray-900">{patients.filter(p => p.risk === "High").length}</p>
+                        </div>
+                        <AlertTriangle className="h-8 w-8 text-red-600" />
                       </div>
-                      <AlertTriangle className="h-8 w-8 text-red-600" />
-                    </div>
-                    <div className="mt-4 flex items-center text-sm">
-                      <Clock className="h-4 w-4 text-yellow-600 mr-1" />
-                      <span className="text-yellow-600">{patients.filter(p => p.risk === "High").length} need immediate attention</span>
-                    </div>
-                  </CardContent>
-                </Card>
+                      <div className="mt-4 flex items-center text-sm">
+                        <Clock className="h-4 w-4 text-yellow-600 mr-1" />
+                        <span className="text-yellow-600">{patients.filter(p => p.risk === "High").length} need immediate attention</span>
+                      </div>
+                    </CardContent>
+                  </Card>
 
-                <Card className="shadow-lg">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-gray-600">Prediction Accuracy</p>
-                        <p className="text-3xl font-bold text-gray-900">94.2%</p>
+                  <Card className="shadow-lg">
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-gray-600">Prediction Accuracy</p>
+                          <p className="text-3xl font-bold text-gray-900">94.2%</p>
+                        </div>
+                        <Activity className="h-8 w-8 text-green-600" />
                       </div>
-                      <Activity className="h-8 w-8 text-green-600" />
-                    </div>
-                    <div className="mt-4 flex items-center text-sm">
-                      <CheckCircle className="h-4 w-4 text-green-600 mr-1" />
-                      <span className="text-green-600">Above target (90%)</span>
-                    </div>
-                  </CardContent>
-                </Card>
+                      <div className="mt-4 flex items-center text-sm">
+                        <CheckCircle className="h-4 w-4 text-green-600 mr-1" />
+                        <span className="text-green-600">Above target (90%)</span>
+                      </div>
+                    </CardContent>
+                  </Card>
 
-                <Card className="shadow-lg">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-gray-600">Cost Savings</p>
-                        <p className="text-3xl font-bold text-gray-900">$24.5K</p>
+                  <Card className="shadow-lg">
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-gray-600">Cost Savings</p>
+                          <p className="text-3xl font-bold text-gray-900">$24.5K</p>
+                        </div>
+                        <DollarSign className="h-8 w-8 text-purple-600" />
                       </div>
-                      <DollarSign className="h-8 w-8 text-purple-600" />
-                    </div>
-                    <div className="mt-4 flex items-center text-sm">
-                      <TrendingUp className="h-4 w-4 text-green-600 mr-1" />
-                      <span className="text-green-600">This quarter</span>
-                    </div>
-                  </CardContent>
-                </Card>
+                      <div className="mt-4 flex items-center text-sm">
+                        <TrendingUp className="h-4 w-4 text-green-600 mr-1" />
+                        <span className="text-green-600">This quarter</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
               </div>
             </div>
-
-            {/* Patient List */}
-            <Card className="lg:col-span-2 shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="h-5 w-5 text-blue-600" />
-                  Recent Patients
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
+            {/* Recent Patients and Recent Inventory */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Recent Patients */}
+              <div className="bg-white rounded-xl shadow p-6">
+                <h3 className="text-xl font-bold mb-4 flex items-center gap-2"><Users className="w-6 h-6 text-pink-500" /> Recent Patients</h3>
                 <div className="space-y-4">
-                  {patients.slice(0, 10).map((patient, index) => (
-                    <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-rose-500 rounded-full flex items-center justify-center text-white font-semibold">
-                          {patient.name}
-                        </div>
+                  {patients.slice(0, 5).map((p, idx) => (
+                    <div key={idx} className="flex items-center justify-between bg-pink-50 rounded-lg px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        <div className="bg-pink-200 rounded-full w-10 h-10 flex items-center justify-center font-bold text-white text-lg">{p.name.slice(0, 2)}</div>
                         <div>
-                          <div className="font-medium text-gray-900">{patient.name}</div>
-                          <div className="text-sm text-gray-600">Age {patient.age}</div>
+                          <div className="font-semibold text-pink-900">{p.name}</div>
+                          <div className="text-xs text-gray-500">Age {p.age}</div>
                         </div>
                       </div>
                       <div className="text-right">
-                        <Badge
-                          variant={
-                            patient.risk === "High"
-                              ? "destructive"
-                              : patient.risk === "Moderate"
-                              ? "outline"
-                              : patient.risk === "Medium"
-                              ? "default"
-                              : "secondary"
-                          }
-                          className="mb-1"
-                        >
-                          {patient.risk} Risk
-                        </Badge>
-                        <div className="text-sm text-gray-600">{patient.date}</div>
+                        <div className="text-xs text-gray-400">{p.risk}</div>
+                        <div className="text-xs text-gray-400">{p.date}</div>
                       </div>
                     </div>
                   ))}
+                  {patients.length === 0 && <div className="text-gray-400">No recent patients found.</div>}
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Inventory Management */}
-            <Card className="shadow-lg">
-              <CardHeader>
-                <CardTitle>Recent Inventory</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold mb-1">Facility</label>
-                    <select
-                      className="w-full p-2 border rounded-md"
-                      value={facilityFilter}
-                      onChange={e => setFacilityFilter(e.target.value)}
-                    >
-                      <option value="">All Facilities</option>
-                      {facilities.map(([key, display]) => (
-                        <option key={key} value={key}>{display}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold mb-1">Category</label>
-                    <select
-                      className="w-full p-2 border rounded-md"
-                      value={categoryFilter}
-                      onChange={e => setCategoryFilter(e.target.value)}
-                    >
-                      <option value="">All Categories</option>
-                      {categories.map(c => (
-                        <option key={c} value={c}>{c}</option>
-                      ))}
-                    </select>
-                  </div>
+              </div>
+              {/* Recent Inventory */}
+              <div className="bg-white rounded-xl shadow p-6">
+                <h3 className="text-xl font-bold mb-4 flex items-center gap-2"><Package className="w-6 h-6 text-orange-500" /> Recent Inventory</h3>
+                <div className="flex gap-4 mb-4">
+                  <select className="border rounded px-2 py-1" value={facilityFilter} onChange={e => setFacilityFilter(e.target.value)}>
+                    <option value="">All Facilities</option>
+                    {facilities.map(([key, name]) => <option key={key} value={key}>{name}</option>)}
+                  </select>
+                  <select className="border rounded px-2 py-1" value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)}>
+                    <option value="">All Categories</option>
+                    {categories.map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
                 </div>
                 <div className="space-y-4">
-                  {filteredInventoryItems.slice(0, 10).map((item: InventoryItem, index: number) => (
-                    <div key={index} className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <div className="font-medium">{item.item}</div>
-                          <div className="text-sm text-gray-500">{item.category}</div>
-                          <div className="text-xs text-gray-400">{item.location}</div>
-                        </div>
-                        <Badge variant={item.status === "critical" ? "destructive" : item.status === "low" ? "secondary" : "default"}>
-                          {item.stock} units
-                        </Badge>
+                  {filteredInventoryItems.slice(0, 5).map((item, idx) => (
+                    <div key={idx} className="bg-orange-50 rounded-lg px-4 py-3 flex items-center justify-between">
+                      <div>
+                        <div className="font-semibold text-orange-900">{item.item}</div>
+                        <div className="text-xs text-gray-500">{item.category} <span className="ml-2 text-gray-400">{item.location}</span></div>
+                        <div className="text-xs text-gray-400">Threshold: {item.threshold} units</div>
                       </div>
-                      <Progress value={(item.stock / (item.threshold * 4)) * 100} className="h-2" />
-                      <div className="text-xs text-gray-500">Threshold: {item.threshold} units</div>
+                      <div className="flex flex-col items-end">
+                        <div className="font-bold text-orange-700">{item.stock} units</div>
+                        <div className={`w-24 h-2 rounded-full mt-1 ${item.status === 'critical' ? 'bg-red-400' : item.status === 'low' ? 'bg-yellow-400' : 'bg-green-300'}`}></div>
+                      </div>
                     </div>
                   ))}
+                  {filteredInventoryItems.length === 0 && <div className="text-gray-400">No inventory items found.</div>}
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+            </div>
+          </>
         )}
 
         {activeTab === 'treatment' && (

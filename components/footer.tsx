@@ -43,15 +43,6 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Hackathon Badge */}
-          <div className="inline-flex items-center gap-3 bg-gradient-to-r from-pink-600/30 to-purple-600/30 backdrop-blur-sm border border-pink-400/30 rounded-full px-8 py-4 mb-8">
-            <Award className="h-6 w-6 text-yellow-400" />
-            <div className="text-center">
-              <div className="text-xl font-bold text-pink-300">Code Her Care 2025</div>
-              <div className="text-sm text-purple-200">Ovarian Cyst Prediction</div>
-            </div>
-          </div>
-
           <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
             Revolutionizing women's healthcare with AI-powered ovarian cyst prediction and comprehensive care management
             designed for low-resource settings across Africa.

@@ -1,8 +1,13 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Heart, Brain, TrendingUp } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from 'next/navigation'
 
 export function Hero() {
+  const router = useRouter();
+
   return (
     <section
       id="home"
@@ -28,19 +33,24 @@ export function Hero() {
             and comprehensive care coordination in low-resource settings.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-            <Link href="/demo">
-              <Button size="lg" className="bg-white text-purple-600 hover:bg-gray-100 font-semibold px-8 py-3">
-                Try Live Demo
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
-            <Button size="lg" variant="outline" className="border-white text-purple-900 hover:bg-white/10 px-8 py-3">
+          <div className="flex gap-4 justify-center mt-8">
+            <button
+              className="bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-6 rounded-lg shadow"
+              onClick={() => router.push('/demo')}
+            >
+              Live Demo
+            </button>
+            <a
+              href="https://ayfasasa.blogspot.com/2025/06/ovarian-cyst-and-myth-surroundin-it.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-white border border-pink-500 text-pink-600 font-bold py-3 px-6 rounded-lg shadow hover:bg-pink-50 inline-block"
+            >
               View Research
-            </Button>
+            </a>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto mt-12">
             <div className="flex items-center justify-center gap-3 bg-white/10 backdrop-blur-sm rounded-lg p-4">
               <Brain className="h-6 w-6 text-pink-300" />
               <span className="font-medium">AI Prediction Models</span>

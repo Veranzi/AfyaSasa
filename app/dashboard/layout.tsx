@@ -1,10 +1,22 @@
 import { DashboardNav } from "@/components/dashboard-nav"
+import { useEffect } from "react"
+import { useRouter } from "next/navigation"
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const router = useRouter()
+
+  useEffect(() => {
+    // TODO: Replace with real authentication check
+    const isAuthenticated = false // <-- Replace with real logic
+    if (!isAuthenticated) {
+      router.push("/signup")
+    }
+  }, [router])
+
   return (
     <div className="h-full relative">
       <div className="hidden h-full md:flex md:w-72 md:flex-col md:fixed md:inset-y-0 z-[80] bg-white">
