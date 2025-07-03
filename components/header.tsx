@@ -1,14 +1,31 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Heart, Menu, X, Phone, Mail } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import { auth } from "@/lib/firebase"
+import { signOut } from "firebase/auth"
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [user, setUser] = useState(null)
   const router = useRouter();
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((firebaseUser) => {
+      setUser(firebaseUser)
+    })
+    return () => unsubscribe()
+  }, [])
+
+  const handleSignOut = async () => {
+    await signOut(auth)
+    setUser(null)
+    router.push("/signup")
+  }
 
   // Helper for smooth scrolling to section
   const handleSectionNav = (sectionId: string) => {
@@ -78,11 +95,25 @@ export function Header() {
             <Link href="/blogs" className="text-gray-700 hover:text-pink-600 font-medium transition-colors">
               Blogs
             </Link>
-            <Link href="/signup">
-              <Button className="bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700">
-                Get Started
-              </Button>
-            </Link>
+            {!user && (
+              <Link href="/signup">
+                <Button className="bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700">
+                  Get Started
+                </Button>
+              </Link>
+            )}
+            {user && (
+              <div className="relative group ml-4">
+                <Avatar className="cursor-pointer">
+                  <AvatarImage src={user.photoURL || undefined} alt={user.email || "User"} />
+                  <AvatarFallback>{user.email ? user.email[0].toUpperCase() : "U"}</AvatarFallback>
+                </Avatar>
+                <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
+                  <div className="px-4 py-2 text-sm text-gray-700 border-b">{user.email}</div>
+                  <button onClick={handleSignOut} className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 rounded-b-lg">Sign Out</button>
+                </div>
+              </div>
+            )}
           </nav>
 
           {/* Mobile Menu Button */}
@@ -115,11 +146,25 @@ export function Header() {
               <Link href="/blogs" className="text-gray-700 hover:text-pink-600 font-medium transition-colors py-2">
                 Blogs
               </Link>
-              <Link href="/signup">
-                <Button className="bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 mt-4">
-                  Get Started
-                </Button>
-              </Link>
+              {!user && (
+                <Link href="/signup">
+                  <Button className="bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 mt-4">
+                    Get Started
+                  </Button>
+                </Link>
+              )}
+              {user && (
+                <div className="relative group ml-4">
+                  <Avatar className="cursor-pointer">
+                    <AvatarImage src={user.photoURL || undefined} alt={user.email || "User"} />
+                    <AvatarFallback>{user.email ? user.email[0].toUpperCase() : "U"}</AvatarFallback>
+                  </Avatar>
+                  <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
+                    <div className="px-4 py-2 text-sm text-gray-700 border-b">{user.email}</div>
+                    <button onClick={handleSignOut} className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 rounded-b-lg">Sign Out</button>
+                  </div>
+                </div>
+              )}
             </nav>
           </div>
         )}

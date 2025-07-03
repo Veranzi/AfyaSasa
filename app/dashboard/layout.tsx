@@ -2,6 +2,7 @@
 import { DashboardNav } from "@/components/dashboard-nav"
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { auth } from "@/lib/firebase"
 
 export default function DashboardLayout({
   children,
@@ -11,11 +12,12 @@ export default function DashboardLayout({
   const router = useRouter()
 
   useEffect(() => {
-    // TODO: Replace with real authentication check
-    const isAuthenticated = false // <-- Replace with real logic
-    if (!isAuthenticated) {
-      router.push("/signup")
-    }
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (!user) {
+        router.push("/signup")
+      }
+    })
+    return () => unsubscribe()
   }, [router])
 
   return (
