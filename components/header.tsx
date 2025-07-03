@@ -36,11 +36,20 @@ export function Header() {
         if (el) {
           el.scrollIntoView({ behavior: "smooth" })
         }
+        // Update hash in URL for highlighting
+        window.history.replaceState(null, '', `/#${sectionId}`)
       } else {
-        router.push(`/#${sectionId}`)
+        router.replace(`/#${sectionId}`)
       }
     }
   }
+
+  // Determine active nav
+  const isHome = pathname === "/" || pathname === "/#home"
+  const isFeatures = pathname === "/#features"
+  const isDemo = pathname.startsWith("/demo")
+  const isDashboard = pathname.startsWith("/dashboard")
+  const isBlogs = pathname.startsWith("/blogs")
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-pink-100">
@@ -77,35 +86,26 @@ export function Header() {
             </div>
           </div>
 
-          {/* Back Button */}
-          <button
-            onClick={() => router.back()}
-            className="hidden md:inline-flex items-center px-3 py-1.5 rounded-lg bg-pink-50 text-pink-600 hover:bg-pink-100 font-medium transition-colors ml-4"
-            aria-label="Go Back"
-          >
-            ← Back
-          </button>
-
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-8">
             <button
               onClick={() => handleSectionNav("home")}
-              className={`text-gray-700 hover:text-pink-600 font-medium transition-colors bg-transparent border-0 cursor-pointer ${pathname === "/" ? "underline underline-offset-4 text-pink-600" : ""}`}
+              className={`text-gray-700 hover:text-pink-600 font-medium transition-colors bg-transparent border-0 cursor-pointer ${isHome ? "underline underline-offset-4 text-pink-600" : ""}`}
             >
               Home
             </button>
             <button
               onClick={() => handleSectionNav("features")}
-              className={`text-gray-700 hover:text-pink-600 font-medium transition-colors bg-transparent border-0 cursor-pointer ${pathname === "/#features" ? "underline underline-offset-4 text-pink-600" : ""}`}
+              className={`text-gray-700 hover:text-pink-600 font-medium transition-colors bg-transparent border-0 cursor-pointer ${isFeatures ? "underline underline-offset-4 text-pink-600" : ""}`}
             >
               Features
             </button>
-            <Link href="/demo" className={`text-gray-700 hover:text-pink-600 font-medium transition-colors ${pathname.startsWith("/demo") ? "underline underline-offset-4 text-pink-600" : ""}`}>
+            <Link href="/demo" className={`text-gray-700 hover:text-pink-600 font-medium transition-colors ${isDemo ? "underline underline-offset-4 text-pink-600" : ""}`}>
               Live Demo
             </Link>
             {user && (
               <div className="relative group">
-                <button className={`text-gray-700 hover:text-pink-600 font-medium transition-colors flex items-center gap-1 bg-transparent border-0 cursor-pointer ${pathname.startsWith("/dashboard") ? "underline underline-offset-4 text-pink-600" : ""}`}
+                <button className={`text-gray-700 hover:text-pink-600 font-medium transition-colors flex items-center gap-1 bg-transparent border-0 cursor-pointer ${isDashboard ? "underline underline-offset-4 text-pink-600" : ""}`}
                   tabIndex={0}
                 >
                   Dashboard
@@ -123,7 +123,7 @@ export function Header() {
                 </div>
               </div>
             )}
-            <Link href="/blogs" className={`text-gray-700 hover:text-pink-600 font-medium transition-colors ${pathname.startsWith("/blogs") ? "underline underline-offset-4 text-pink-600" : ""}`}>
+            <Link href="/blogs" className={`text-gray-700 hover:text-pink-600 font-medium transition-colors ${isBlogs ? "underline underline-offset-4 text-pink-600" : ""}`}>
               Blogs
             </Link>
             {!user && (
@@ -161,19 +161,19 @@ export function Header() {
           <div className="lg:hidden py-4 border-t border-pink-50">
             <nav className="flex flex-col gap-4">
               <button onClick={() => { setIsMenuOpen(false); handleSectionNav("home") }}
-                className={`text-gray-700 hover:text-pink-600 font-medium transition-colors py-2 bg-transparent border-0 text-left cursor-pointer ${pathname === "/" ? "underline underline-offset-4 text-pink-600" : ""}`}>
+                className={`text-gray-700 hover:text-pink-600 font-medium transition-colors py-2 bg-transparent border-0 text-left cursor-pointer ${isHome ? "underline underline-offset-4 text-pink-600" : ""}`}>
                 Home
               </button>
               <button onClick={() => { setIsMenuOpen(false); handleSectionNav("features") }}
-                className={`text-gray-700 hover:text-pink-600 font-medium transition-colors py-2 bg-transparent border-0 text-left cursor-pointer ${pathname === "/#features" ? "underline underline-offset-4 text-pink-600" : ""}`}>
+                className={`text-gray-700 hover:text-pink-600 font-medium transition-colors py-2 bg-transparent border-0 text-left cursor-pointer ${isFeatures ? "underline underline-offset-4 text-pink-600" : ""}`}>
                 Features
               </button>
-              <Link href="/demo" className={`text-gray-700 hover:text-pink-600 font-medium transition-colors py-2 ${pathname.startsWith("/demo") ? "underline underline-offset-4 text-pink-600" : ""}`}>
+              <Link href="/demo" className={`text-gray-700 hover:text-pink-600 font-medium transition-colors py-2 ${isDemo ? "underline underline-offset-4 text-pink-600" : ""}`}>
                 Live Demo
               </Link>
               {user && (
                 <div className="relative group">
-                  <button className={`text-gray-700 hover:text-pink-600 font-medium transition-colors flex items-center gap-1 bg-transparent border-0 cursor-pointer py-2 ${pathname.startsWith("/dashboard") ? "underline underline-offset-4 text-pink-600" : ""}`}
+                  <button className={`text-gray-700 hover:text-pink-600 font-medium transition-colors flex items-center gap-1 bg-transparent border-0 cursor-pointer py-2 ${isDashboard ? "underline underline-offset-4 text-pink-600" : ""}`}
                     tabIndex={0}
                   >
                     Dashboard
@@ -191,7 +191,7 @@ export function Header() {
                   </div>
                 </div>
               )}
-              <Link href="/blogs" className={`text-gray-700 hover:text-pink-600 font-medium transition-colors py-2 ${pathname.startsWith("/blogs") ? "underline underline-offset-4 text-pink-600" : ""}`}>
+              <Link href="/blogs" className={`text-gray-700 hover:text-pink-600 font-medium transition-colors py-2 ${isBlogs ? "underline underline-offset-4 text-pink-600" : ""}`}>
                 Blogs
               </Link>
               {!user && (
