@@ -11,7 +11,7 @@ export default function DemoPage() {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (!user) {
-        router.push("/signup")
+        router.replace("/signup")
       }
     })
     return () => unsubscribe()

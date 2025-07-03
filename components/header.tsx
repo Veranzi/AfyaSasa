@@ -4,15 +4,16 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Heart, Menu, X, Phone, Mail } from "lucide-react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { auth } from "@/lib/firebase"
-import { signOut } from "firebase/auth"
+import { signOut, User } from "firebase/auth"
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [user, setUser] = useState(null)
+  const [user, setUser] = useState<User | null>(null)
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((firebaseUser) => {
@@ -24,7 +25,7 @@ export function Header() {
   const handleSignOut = async () => {
     await signOut(auth)
     setUser(null)
-    router.push("/signup")
+    router.replace("/signup")
   }
 
   // Helper for smooth scrolling to section
@@ -76,23 +77,53 @@ export function Header() {
             </div>
           </div>
 
+          {/* Back Button */}
+          <button
+            onClick={() => router.back()}
+            className="hidden md:inline-flex items-center px-3 py-1.5 rounded-lg bg-pink-50 text-pink-600 hover:bg-pink-100 font-medium transition-colors ml-4"
+            aria-label="Go Back"
+          >
+            ← Back
+          </button>
+
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-8">
-            <button onClick={() => handleSectionNav("home")}
-              className="text-gray-700 hover:text-pink-600 font-medium transition-colors bg-transparent border-0 cursor-pointer">
+            <button
+              onClick={() => handleSectionNav("home")}
+              className={`text-gray-700 hover:text-pink-600 font-medium transition-colors bg-transparent border-0 cursor-pointer ${pathname === "/" ? "underline underline-offset-4 text-pink-600" : ""}`}
+            >
               Home
             </button>
-            <button onClick={() => handleSectionNav("features")}
-              className="text-gray-700 hover:text-pink-600 font-medium transition-colors bg-transparent border-0 cursor-pointer">
+            <button
+              onClick={() => handleSectionNav("features")}
+              className={`text-gray-700 hover:text-pink-600 font-medium transition-colors bg-transparent border-0 cursor-pointer ${pathname === "/#features" ? "underline underline-offset-4 text-pink-600" : ""}`}
+            >
               Features
             </button>
-            <Link href="/demo" className="text-gray-700 hover:text-pink-600 font-medium transition-colors">
+            <Link href="/demo" className={`text-gray-700 hover:text-pink-600 font-medium transition-colors ${pathname.startsWith("/demo") ? "underline underline-offset-4 text-pink-600" : ""}`}>
               Live Demo
             </Link>
-            <Link href="/dashboard" className="text-gray-700 hover:text-pink-600 font-medium transition-colors">
-              Dashboard
-            </Link>
-            <Link href="/blogs" className="text-gray-700 hover:text-pink-600 font-medium transition-colors">
+            {user && (
+              <div className="relative group">
+                <button className={`text-gray-700 hover:text-pink-600 font-medium transition-colors flex items-center gap-1 bg-transparent border-0 cursor-pointer ${pathname.startsWith("/dashboard") ? "underline underline-offset-4 text-pink-600" : ""}`}
+                  tabIndex={0}
+                >
+                  Dashboard
+                  <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                </button>
+                <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
+                  <Link href="/dashboard" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Overview</Link>
+                  <Link href="/dashboard/analytics" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Analytics</Link>
+                  <Link href="/dashboard/inventory" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Inventory</Link>
+                  <Link href="/dashboard/patients" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Patients</Link>
+                  <Link href="/dashboard/reports" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Reports</Link>
+                  <Link href="/dashboard/settings" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Settings</Link>
+                  <Link href="/dashboard/treatment" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Treatment</Link>
+                  <Link href="/dashboard/notifications" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Notifications</Link>
+                </div>
+              </div>
+            )}
+            <Link href="/blogs" className={`text-gray-700 hover:text-pink-600 font-medium transition-colors ${pathname.startsWith("/blogs") ? "underline underline-offset-4 text-pink-600" : ""}`}>
               Blogs
             </Link>
             {!user && (
@@ -130,20 +161,37 @@ export function Header() {
           <div className="lg:hidden py-4 border-t border-pink-50">
             <nav className="flex flex-col gap-4">
               <button onClick={() => { setIsMenuOpen(false); handleSectionNav("home") }}
-                className="text-gray-700 hover:text-pink-600 font-medium transition-colors py-2 bg-transparent border-0 text-left cursor-pointer">
+                className={`text-gray-700 hover:text-pink-600 font-medium transition-colors py-2 bg-transparent border-0 text-left cursor-pointer ${pathname === "/" ? "underline underline-offset-4 text-pink-600" : ""}`}>
                 Home
               </button>
               <button onClick={() => { setIsMenuOpen(false); handleSectionNav("features") }}
-                className="text-gray-700 hover:text-pink-600 font-medium transition-colors py-2 bg-transparent border-0 text-left cursor-pointer">
+                className={`text-gray-700 hover:text-pink-600 font-medium transition-colors py-2 bg-transparent border-0 text-left cursor-pointer ${pathname === "/#features" ? "underline underline-offset-4 text-pink-600" : ""}`}>
                 Features
               </button>
-              <Link href="/demo" className="text-gray-700 hover:text-pink-600 font-medium transition-colors py-2">
+              <Link href="/demo" className={`text-gray-700 hover:text-pink-600 font-medium transition-colors py-2 ${pathname.startsWith("/demo") ? "underline underline-offset-4 text-pink-600" : ""}`}>
                 Live Demo
               </Link>
-              <Link href="/dashboard" className="text-gray-700 hover:text-pink-600 font-medium transition-colors py-2">
-                Dashboard
-              </Link>
-              <Link href="/blogs" className="text-gray-700 hover:text-pink-600 font-medium transition-colors py-2">
+              {user && (
+                <div className="relative group">
+                  <button className={`text-gray-700 hover:text-pink-600 font-medium transition-colors flex items-center gap-1 bg-transparent border-0 cursor-pointer py-2 ${pathname.startsWith("/dashboard") ? "underline underline-offset-4 text-pink-600" : ""}`}
+                    tabIndex={0}
+                  >
+                    Dashboard
+                    <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                  </button>
+                  <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
+                    <Link href="/dashboard" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Overview</Link>
+                    <Link href="/dashboard/analytics" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Analytics</Link>
+                    <Link href="/dashboard/inventory" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Inventory</Link>
+                    <Link href="/dashboard/patients" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Patients</Link>
+                    <Link href="/dashboard/reports" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Reports</Link>
+                    <Link href="/dashboard/settings" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Settings</Link>
+                    <Link href="/dashboard/treatment" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Treatment</Link>
+                    <Link href="/dashboard/notifications" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Notifications</Link>
+                  </div>
+                </div>
+              )}
+              <Link href="/blogs" className={`text-gray-700 hover:text-pink-600 font-medium transition-colors py-2 ${pathname.startsWith("/blogs") ? "underline underline-offset-4 text-pink-600" : ""}`}>
                 Blogs
               </Link>
               {!user && (
