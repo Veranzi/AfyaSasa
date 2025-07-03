@@ -139,10 +139,10 @@ export function PredictionDemo() {
             </div>
           </div>
           {/* Main Content */}
-          <div className="flex-1">
+          <div className="flex-1 pr-4 md:pr-16">
             <div className="tab-content bg-white rounded-2xl shadow-xl p-2 md:p-4 animate-fadeIn w-full">
               {activeTab === 'prediction' && (
-                <div className="form-container w-full px-0 sm:px-2 md:px-4">
+                <div className="form-container w-full px-0 sm:px-2 md:px-4 pr-4 md:pr-12">
                   <h2 className="text-2xl font-bold text-center mb-2 text-pink-700 flex items-center justify-center gap-2"><ClipboardList className="w-6 h-6 text-pink-500" /> Patient Assessment Form</h2>
                   <p className="text-center mb-6 text-gray-500">Fill in the patient details to get management recommendations</p>
                   <form onSubmit={handleAnalyze} className="space-y-6 w-full text-base md:text-lg">

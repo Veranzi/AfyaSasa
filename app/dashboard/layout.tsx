@@ -1,3 +1,4 @@
+"use client"
 import { DashboardNav } from "@/components/dashboard-nav"
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
