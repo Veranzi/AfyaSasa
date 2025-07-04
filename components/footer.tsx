@@ -174,23 +174,21 @@ export function Footer() {
               <h4 className="text-lg font-semibold text-indigo-300">Connect</h4>
             </div>
             <div className="pl-10">
-              <p className="text-gray-300 mb-4 text-sm">Follow our journey</p>
-              <div className="grid grid-cols-2 gap-3">
-                <a
-                  href="https://github.com/afyacenter"
-                  className="flex items-center justify-center w-12 h-12 bg-gray-800/50 rounded-xl hover:bg-pink-600/30 transition-all duration-300 group"
-                >
+              <h3 className="text-xl font-semibold mb-2 text-pink-100">Join our journey</h3>
+              <p className="text-pink-200 mb-4">Be part of the revolution in women's health.</p>
+              <div className="flex justify-center gap-4 mt-2">
+                <a href="https://github.com/afyacenter" className="flex items-center justify-center w-12 h-12 bg-gray-800/50 rounded-xl hover:bg-pink-600/30 transition-all duration-300 group">
                   <Github className="h-5 w-5 text-gray-400 group-hover:text-pink-300" />
                 </a>
-                <a
-                  href="https://instagram.com/afyacenter"
-                  className="flex items-center justify-center w-12 h-12 bg-gray-800/50 rounded-xl hover:bg-pink-500/30 transition-all duration-300 group"
-                >
+                <a href="https://instagram.com/afyacenter" className="flex items-center justify-center w-12 h-12 bg-gray-800/50 rounded-xl hover:bg-pink-500/30 transition-all duration-300 group">
                   <Instagram className="h-5 w-5 text-gray-400 group-hover:text-pink-300" />
                 </a>
-              </div>
-              <div className="mt-4 text-xs text-gray-400">
-                <p>@afyacenter</p>
+                <a href="https://x.com/afyasasa" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)" className="flex items-center justify-center w-12 h-12 bg-gray-800/50 rounded-xl hover:bg-blue-400/30 transition-all duration-300 group">
+                  <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M17.53 2.47A12 12 0 0 0 2.47 17.53 12 12 0 0 0 17.53 2.47zm-1.06 1.06A10 10 0 1 1 3.53 18.47 10 10 0 0 1 16.47 3.53zm-6.36 2.83l4.24 4.24-4.24 4.24 1.41 1.41 4.24-4.24 4.24 4.24 1.41-1.41-4.24-4.24 4.24-4.24-1.41-1.41-4.24 4.24-4.24-4.24-1.41 1.41z"/></svg>
+                </a>
+                <a href="https://linkedin.com/company/afyasasa" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="flex items-center justify-center w-12 h-12 bg-gray-800/50 rounded-xl hover:bg-blue-600/30 transition-all duration-300 group">
+                  <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0 2.76 2.24 5 5 5h14c2.76 0 5-2.24 5-5v-14c0-2.76-2.24-5-5-5zm-11 19h-3v-10h3v10zm-1.5-11.27c-.966 0-1.75-.79-1.75-1.76 0-.97.784-1.76 1.75-1.76s1.75.79 1.75 1.76c0 .97-.784 1.76-1.75 1.76zm15.5 11.27h-3v-5.6c0-1.34-.03-3.07-1.87-3.07-1.87 0-2.16 1.46-2.16 2.97v5.7h-3v-10h2.88v1.36h.04c.4-.76 1.38-1.56 2.84-1.56 3.04 0 3.6 2 3.6 4.59v5.61z"/></svg>
+                </a>
               </div>
             </div>
           </div>
@@ -218,7 +216,7 @@ export function Footer() {
 
         {/* Footer Bottom - Social Left-Aligned */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 border-t border-pink-900/30 pt-8 mt-12">
-          <div className="text-center text-sm text-pink-200 py-4 border-t border-pink-900/30 mt-12">
+          <div className="w-full text-center text-sm text-pink-200 py-4 border-t border-pink-900/30 mt-12">
             © 2025 AfyaSasa. All rights reserved.
           </div>
         </div>
