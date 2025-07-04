@@ -94,3 +94,49 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* Social icons slide from center to right */
+@keyframes slideIcons {
+  0% {
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    left: 100%;
+    transform: translateX(-100%);
+    opacity: 1;
+  }
+}
+.animate-slide-icons {
+  animation: slideIcons 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  position: absolute;
+  top: 0;
+}
+
+.animate-delay-0 { animation-delay: 0s; }
+.animate-delay-1 { animation-delay: 0.2s; }
+.animate-delay-2 { animation-delay: 0.4s; }
+.animate-delay-3 { animation-delay: 0.6s; }
+
+@keyframes iconSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50vw);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+.icon-animate {
+  animation: iconSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  opacity: 0;
+}
+.icon-delay-0 { animation-delay: 0s; }
+.icon-delay-1 { animation-delay: 0.2s; }
+.icon-delay-2 { animation-delay: 0.4s; }
+.icon-delay-3 { animation-delay: 0.6s; }
