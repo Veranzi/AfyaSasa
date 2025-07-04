@@ -30,32 +30,21 @@ export function Footer() {
 
       <div className="relative container mx-auto px-4 py-16">
         {/* Top Section - Brand & Hackathon */}
-        <div className="text-center mb-16">
-          <div className="flex items-center justify-center gap-4 mb-6">
-            <div className="p-4 bg-gradient-to-br from-pink-500 to-rose-500 rounded-2xl shadow-2xl">
-              <svg width="40" height="40" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="16" cy="18" r="6" fill="#F472B6"/>
-                <rect x="14" y="24" width="4" height="12" rx="2" fill="#F472B6"/>
-                <rect x="8" y="28" width="16" height="2" rx="1" fill="#F472B6"/>
-                <path d="M36 38C36 38 28 30.5 28 25.5C28 22.42 30.42 20 33.5 20C35.24 20 36.91 20.81 38 22.08C39.09 20.81 40.76 20 42.5 20C45.58 20 48 22.42 48 25.5C48 30.5 40 38 40 38H36Z" fill="#F43F5E" stroke="#F43F5E" stroke-width="1"/>
-                <rect x="36" y="4" width="12" height="12" rx="6" fill="#a21caf"/>
-                <rect x="41" y="8" width="2" height="8" rx="1" fill="#fff"/>
-                <rect x="37" y="12" width="10" height="2" rx="1" fill="#fff"/>
-              </svg>
-            </div>
-            <div>
-              <h2 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-300 via-purple-300 to-rose-300">
-                AfyaSasa
-              </h2>
-              <p className="text-pink-200 text-lg">Empowering Women's Health Through AI</p>
-            </div>
-          </div>
-
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-            Revolutionizing women's healthcare with AI-powered ovarian cyst prediction and comprehensive care management
-            designed for low-resource settings across Africa.
-          </p>
+        <div className="flex flex-col items-center justify-center mb-16">
+          <img
+            src="/AfyaSasa logo.png"
+            alt="AfyaSasa Logo"
+            width={160}
+            height={160}
+            className="object-contain rounded-full"
+          />
+          <p className="text-pink-200 text-lg mt-2 text-center w-full">AI-Powered Women's Health</p>
         </div>
+
+        <p className="text-lg text-gray-200 max-w-2xl mx-auto mb-8">
+          Revolutionizing women's healthcare with AI-powered ovarian cyst prediction and comprehensive care management
+          designed for low-resource settings across Africa.
+        </p>
 
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
@@ -194,18 +183,6 @@ export function Footer() {
                   <Github className="h-5 w-5 text-gray-400 group-hover:text-pink-300" />
                 </a>
                 <a
-                  href="https://linkedin.com/company/afyacenter"
-                  className="flex items-center justify-center w-12 h-12 bg-gray-800/50 rounded-xl hover:bg-blue-600/30 transition-all duration-300 group"
-                >
-                  <Linkedin className="h-5 w-5 text-gray-400 group-hover:text-blue-300" />
-                </a>
-                <a
-                  href="https://twitter.com/afyacenter"
-                  className="flex items-center justify-center w-12 h-12 bg-gray-800/50 rounded-xl hover:bg-blue-400/30 transition-all duration-300 group"
-                >
-                  <Twitter className="h-5 w-5 text-gray-400 group-hover:text-blue-300" />
-                </a>
-                <a
                   href="https://instagram.com/afyacenter"
                   className="flex items-center justify-center w-12 h-12 bg-gray-800/50 rounded-xl hover:bg-pink-500/30 transition-all duration-300 group"
                 >
@@ -239,32 +216,10 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="border-t border-gray-700/50 pt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="text-center md:text-left">
-              <p className="text-gray-300">
-                © {currentYear} <span className="text-pink-400 font-semibold">AfyaSasa</span>. All rights reserved.
-              </p>
-              <p className="text-sm text-gray-500 mt-1">
-                Powered by{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-rose-400 font-semibold">
-                  AfyaSasa
-                </span>{" "}
-                - Transforming Women's Healthcare with AI
-              </p>
-            </div>
-            <div className="flex items-center gap-6 text-sm">
-              <a href="#privacy" className="text-gray-400 hover:text-pink-400 transition-colors">
-                Privacy
-              </a>
-              <a href="#terms" className="text-gray-400 hover:text-purple-400 transition-colors">
-                Terms
-              </a>
-              <a href="#support" className="text-gray-400 hover:text-rose-400 transition-colors">
-                Support
-              </a>
-            </div>
+        {/* Footer Bottom - Social Left-Aligned */}
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 border-t border-pink-900/30 pt-8 mt-12">
+          <div className="text-center text-sm text-pink-200 py-4 border-t border-pink-900/30 mt-12">
+            © 2025 AfyaSasa. All rights reserved.
           </div>
         </div>
       </div>

@@ -75,23 +75,31 @@ export function Header() {
         <div className="flex items-center justify-between py-4">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-br from-pink-500 to-rose-500 rounded-xl">
-              <svg width="32" height="32" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="16" cy="18" r="6" fill="#F472B6"/>
-                <rect x="14" y="24" width="4" height="12" rx="2" fill="#F472B6"/>
-                <rect x="8" y="28" width="16" height="2" rx="1" fill="#F472B6"/>
-                <path d="M36 38C36 38 28 30.5 28 25.5C28 22.42 30.42 20 33.5 20C35.24 20 36.91 20.81 38 22.08C39.09 20.81 40.76 20 42.5 20C45.58 20 48 22.42 48 25.5C48 30.5 40 38 40 38H36Z" fill="#F43F5E" stroke="#F43F5E" stroke-width="1"/>
-                <rect x="36" y="4" width="12" height="12" rx="6" fill="#a21caf"/>
-                <rect x="41" y="8" width="2" height="8" rx="1" fill="#fff"/>
-                <rect x="37" y="12" width="10" height="2" rx="1" fill="#fff"/>
-              </svg>
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-purple-600">
-                AfyaSasa
-              </h1>
-              <p className="text-xs text-gray-500 -mt-1">AI-Powered Women's Health</p>
-            </div>
+            <img
+              src="/AfyaSasa logo.png"
+              alt="AfyaSasa Logo"
+              width={128}
+              height={128}
+              className="object-contain rounded-full"
+            />
+            <p className="text-xs text-gray-500 mt-2 text-center w-full">AI-Powered Women's Health</p>
+          </div>
+
+          {/* Right: Social & User */}
+          <div className="flex items-center gap-4">
+            {/* User Avatar/Dropdown here */}
+            {user && (
+              <div className="relative group ml-4">
+                <Avatar className="cursor-pointer">
+                  <AvatarImage src={user.photoURL || undefined} alt={user.email || "User"} />
+                  <AvatarFallback>{user.email ? user.email[0].toUpperCase() : "U"}</AvatarFallback>
+                </Avatar>
+                <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
+                  <div className="px-4 py-2 text-sm text-gray-700 border-b">{user.email}</div>
+                  <button onClick={handleSignOut} className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 rounded-b-lg">Sign Out</button>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Desktop Navigation */}
@@ -140,18 +148,6 @@ export function Header() {
                   Get Started
                 </Button>
               </Link>
-            )}
-            {user && (
-              <div className="relative group ml-4">
-                <Avatar className="cursor-pointer">
-                  <AvatarImage src={user.photoURL || undefined} alt={user.email || "User"} />
-                  <AvatarFallback>{user.email ? user.email[0].toUpperCase() : "U"}</AvatarFallback>
-                </Avatar>
-                <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
-                  <div className="px-4 py-2 text-sm text-gray-700 border-b">{user.email}</div>
-                  <button onClick={handleSignOut} className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 rounded-b-lg">Sign Out</button>
-                </div>
-              </div>
             )}
           </nav>
 

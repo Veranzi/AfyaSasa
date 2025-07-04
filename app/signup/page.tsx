@@ -56,9 +56,13 @@ export default function SignupPage() {
       <div className="hidden md:flex flex-col justify-center items-center w-1/2 bg-gradient-to-br from-pink-500 via-purple-500 to-rose-400 text-white p-12 relative">
         <div className="absolute inset-0 bg-black/20" />
         <div className="relative z-10 flex flex-col items-center">
-          <div className="bg-white/20 rounded-full p-6 mb-6 shadow-lg">
-            <Heart className="h-16 w-16 text-pink-200" />
-          </div>
+          <img
+            src="/AfyaSasa logo.png"
+            alt="AfyaSasa Logo"
+            width={128}
+            height={128}
+            className="object-contain rounded-2xl mb-6"
+          />
           <h1 className="text-4xl font-extrabold mb-2 tracking-tight drop-shadow-lg">Welcome to AfyaSasa</h1>
           <p className="text-lg text-pink-100 mb-8 text-center max-w-xs">AI-powered ovarian cyst prediction and care for every woman, everywhere.</p>
           <div className="shadow-xl w-80 h-80 md:w-[28rem] md:h-[28rem] flex items-center justify-center">
