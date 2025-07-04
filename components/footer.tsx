@@ -33,7 +33,15 @@ export function Footer() {
         <div className="text-center mb-16">
           <div className="flex items-center justify-center gap-4 mb-6">
             <div className="p-4 bg-gradient-to-br from-pink-500 to-rose-500 rounded-2xl shadow-2xl">
-              <Heart className="h-8 w-8 text-white" />
+              <svg width="40" height="40" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="16" cy="18" r="6" fill="#F472B6"/>
+                <rect x="14" y="24" width="4" height="12" rx="2" fill="#F472B6"/>
+                <rect x="8" y="28" width="16" height="2" rx="1" fill="#F472B6"/>
+                <path d="M36 38C36 38 28 30.5 28 25.5C28 22.42 30.42 20 33.5 20C35.24 20 36.91 20.81 38 22.08C39.09 20.81 40.76 20 42.5 20C45.58 20 48 22.42 48 25.5C48 30.5 40 38 40 38H36Z" fill="#F43F5E" stroke="#F43F5E" stroke-width="1"/>
+                <rect x="36" y="4" width="12" height="12" rx="6" fill="#a21caf"/>
+                <rect x="41" y="8" width="2" height="8" rx="1" fill="#fff"/>
+                <rect x="37" y="12" width="10" height="2" rx="1" fill="#fff"/>
+              </svg>
             </div>
             <div>
               <h2 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-300 via-purple-300 to-rose-300">
