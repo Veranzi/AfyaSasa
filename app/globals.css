@@ -133,7 +133,7 @@ body {
   }
 }
 .icon-animate {
-  animation: iconSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: iconSlideIn 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
   opacity: 0;
 }
 .icon-delay-0 { animation-delay: 0s; }

@@ -13,6 +13,25 @@ import { useGoogleSheet } from "@/hooks/useGoogleSheet"
 
 const OVARIAN_DATA_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSOrLbxUb6jmar3LIp2tFGHHimYL7Tl6zZTRNqJohoWBaq7sk0UHkxTKPwknP3muI5rx2kE6PwSyrKk/pub?gid=0&single=true&output=csv";
 
+const SYMPTOMS = [
+  "Pelvic pain",
+  "Nausea",
+  "Bloating",
+  "Fatigue",
+  "Irregular periods",
+]
+const ULTRASOUND_OPTIONS = [
+  "Septated cyst",
+  "Hemorrhagic cyst",
+  "Solid mass",
+  "Complex cyst",
+  "Simple cyst",
+]
+const MENOPAUSE_OPTIONS = [
+  "Post-menopausal",
+  "Pre-menopausal",
+]
+
 export function PredictionDemo() {
   const [activeTab, setActiveTab] = useState<'prediction' | 'chatbot'>("prediction")
   const [isAnalyzing, setIsAnalyzing] = useState(false)
@@ -28,51 +47,72 @@ export function PredictionDemo() {
     "Which patient has the highest CA 125 level, and what is the value?",
     "What are the most common symptoms reported by pre-menopausal patients?",
   ])
-  const [formData, setFormData] = useState({
-    age: "12",
-    menopauseStatus: "Post-menopausal",
-    cystSize: "4.2",
-    cystGrowthRate: "2.3",
-    ca125: "35",
-    ultrasoundFeatures: "Simple cyst",
-    symptoms: "Pelvic pain, Nausea",
-  })
-  const [showResult, setShowResult] = useState(false)
+  const [age, setAge] = useState(18)
+  const [menopause, setMenopause] = useState(MENOPAUSE_OPTIONS[0])
+  const [size, setSize] = useState(1)
+  const [growth, setGrowth] = useState(0)
+  const [ca125, setCa125] = useState(0)
+  const [ultrasound, setUltrasound] = useState(ULTRASOUND_OPTIONS[0])
+  const [symptoms, setSymptoms] = useState<string[]>([])
+  const [result, setResult] = useState<string>("")
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string>("")
   const ovarianSheet = useGoogleSheet(OVARIAN_DATA_CSV);
 
-  const handleAnalyze = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    setIsAnalyzing(true);
-    setShowResult(false);
-    setRecommendation("");
-    const requestBody = {
-      Age: parseInt(formData.age, 10),
-      Menopause_Status: formData.menopauseStatus,
-      Cyst_Size_cm: parseFloat(formData.cystSize),
-      Cyst_Growth_Rate_cm_month: parseFloat(formData.cystGrowthRate),
-      CA_125_Level: parseInt(formData.ca125, 10),
-      Ultrasound_Features: formData.ultrasoundFeatures,
-      Reported_Symptoms: formData.symptoms,
-    };
+  const handleSymptomChange = (symptom: string) => {
+    setSymptoms(prev =>
+      prev.includes(symptom)
+        ? prev.filter(s => s !== symptom)
+        : [...prev, symptom]
+    )
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError("")
+    setResult("")
+    // Range validation
+    if (age < 18 || age > 90) {
+      setError("Age must be between 18 and 90."); return;
+    }
+    if (size < 0.1 || size > 20) {
+      setError("Cyst size must be between 0.1 and 20 cm."); return;
+    }
+    if (growth < -5 || growth > 10) {
+      setError("Cyst growth rate must be between -5 and 10 cm/month."); return;
+    }
+    if (ca125 < 0 || ca125 > 2000) {
+      setError("CA-125 level must be between 0 and 2000."); return;
+    }
+    setLoading(true)
+    const payload = {
+      data: [
+        age,
+        menopause,
+        size,
+        growth,
+        ca125,
+        ultrasound,
+        symptoms.join(", ")
+      ]
+    }
     try {
-      const res = await fetch("https://ovarian-cyst-detection.onrender.com/predict", {
+      const response = await fetch("https://veranziverah.app.modelbit.com/v1/predict_ovarian_cyst_management/latest", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestBody),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setRecommendation(data.recommended_management || "Observation");
-        setShowResult(true);
+        body: JSON.stringify(payload)
+      })
+      const data = await response.json()
+      if (data.data) {
+        const top = Object.entries(data.data).sort((a, b) => b[1] - a[1])[0]
+        setResult(`Prediction: ${top[0]} (${(top[1] * 100).toFixed(2)}%)`)
       } else {
-        setRecommendation("Unable to generate recommendation at this time. Please try again or consult with a healthcare provider.");
-        setShowResult(true);
+        setResult("Error: No prediction returned.")
       }
-    } catch (error) {
-      setRecommendation("Unable to generate recommendation at this time. Please try again or consult with a healthcare provider.");
-      setShowResult(true);
+    } catch (error: unknown) {
+      setResult("Error: " + (error instanceof Error ? error.message : String(error)));
     } finally {
-      setIsAnalyzing(false);
+      setLoading(false)
     }
   }
 
@@ -108,13 +148,11 @@ export function PredictionDemo() {
 
   return (
     <section className="py-10 min-h-screen bg-gradient-to-br from-[#f5f7fa] to-[#ffe4ef] font-sans">
-      <div className="container px-0 max-w-full">
-        {/* Main Flex Layout */}
-        <div className="flex flex-col md:flex-row gap-2 md:gap-4">
+      <div className="container px-0 max-w-full h-full">
+        <div className="flex flex-col md:flex-row gap-2 md:gap-4 h-full min-h-[80vh]">
           {/* Sidebar Tabs */}
           <div className="flex flex-row md:flex-col w-full md:w-64 bg-pink-50 rounded-2xl p-2 md:p-4 gap-2 md:gap-4 items-stretch mb-4 md:mb-0">
-            {/* Sidebar Header */}
-            <header className="mb-4 md:mb-8">
+            <header className="mb-4 md:mb-8 mt-8">
               <h1 className="text-2xl md:text-3xl font-extrabold mb-2 bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent flex items-center gap-3">
                 <span>
                   <svg className="inline w-7 h-7 md:w-8 md:h-8 text-pink-500" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M12 21C12 21 4 13.5 4 8.5C4 5.42 6.42 3 9.5 3C11.24 3 12.91 3.81 14 5.08C15.09 3.81 16.76 3 18.5 3C21.58 3 24 5.42 24 8.5C24 13.5 16 21 16 21H12Z" /></svg>
@@ -123,7 +161,7 @@ export function PredictionDemo() {
               </h1>
               <p className="text-base md:text-lg text-gray-500">Advanced diagnostic tool for ovarian cyst assessment and medical guidance</p>
             </header>
-            <div className="flex flex-row md:flex-col gap-2 md:gap-4 w-full">
+            <div className="flex flex-row md:flex-col gap-2 md:gap-4 w-full mt-4">
               <button
                 className={`tab-btn w-full px-6 py-3 rounded-xl font-semibold shadow transition-all text-lg text-left ${activeTab === 'prediction' ? 'bg-gradient-to-r from-pink-600 to-rose-600 text-white' : 'bg-white text-pink-700 hover:bg-pink-100 border border-pink-200'}`}
                 onClick={() => setActiveTab('prediction')}
@@ -139,13 +177,14 @@ export function PredictionDemo() {
             </div>
           </div>
           {/* Main Content */}
-          <div className="flex-1 pr-4 md:pr-16">
-            <div className="tab-content bg-white rounded-2xl shadow-xl p-2 md:p-4 animate-fadeIn w-full">
+          <div className="flex-1 pr-4 md:pr-16 flex items-stretch">
+            <div className="tab-content bg-white rounded-2xl shadow-xl p-2 md:p-4 animate-fadeIn w-full h-full flex flex-col justify-center">
               {activeTab === 'prediction' && (
-                <div className="form-container w-full px-0 sm:px-2 md:px-4 pr-4 md:pr-12">
-                  <h2 className="text-2xl font-bold text-center mb-2 text-pink-700 flex items-center justify-center gap-2"><ClipboardList className="w-6 h-6 text-pink-500" /> Patient Assessment Form</h2>
+                <>
+                  <h2 className="text-2xl font-bold text-center mb-2 text-pink-700 flex items-center justify-center gap-2">Ovarian Cyst Management Predictor</h2>
                   <p className="text-center mb-6 text-gray-500">Fill in the patient details to get management recommendations</p>
-                  <form onSubmit={handleAnalyze} className="space-y-6 w-full text-base md:text-lg">
+                  <form onSubmit={handleSubmit} className="space-y-6 w-full text-base md:text-lg">
+                    {error && <div className="text-red-600 text-center font-semibold mb-2">{error}</div>}
                     <div className="form-row flex flex-col md:flex-row gap-4 md:gap-6 mb-2 w-full">
                       <div className="form-col flex-1 min-w-0 w-full">
                         <div className="form-group mb-2 w-full">
@@ -153,11 +192,12 @@ export function PredictionDemo() {
                           <Input
                             id="age"
                             type="number"
-                            min={1}
-                            max={120}
+                            min={18}
+                            max={90}
+                            placeholder="18–90"
                             className="form-control mt-1 rounded-lg border border-pink-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-100 shadow-sm w-full text-base md:text-lg"
-                            value={formData.age}
-                            onChange={e => setFormData({ ...formData, age: e.target.value })}
+                            value={age}
+                            onChange={e => setAge(Number(e.target.value))}
                             required
                           />
                         </div>
@@ -166,16 +206,14 @@ export function PredictionDemo() {
                         <div className="form-group mb-2 w-full">
                           <Label htmlFor="menopauseStatus" className="font-semibold text-base md:text-lg flex items-center gap-2"><User className="w-4 h-4 text-rose-500" /> Menopause Status</Label>
                           <Select
-                            value={formData.menopauseStatus}
-                            onValueChange={value => setFormData({ ...formData, menopauseStatus: value })}
+                            value={menopause}
+                            onValueChange={value => setMenopause(value)}
                           >
                             <SelectTrigger className="form-control mt-1 rounded-lg border border-pink-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-100 shadow-sm w-full text-base md:text-lg">
                               <SelectValue placeholder="Select status" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="Pre-menopausal">Pre-menopausal</SelectItem>
-                              <SelectItem value="Post-menopausal">Post-menopausal</SelectItem>
-                              <SelectItem value="Peri-menopausal">Peri-menopausal</SelectItem>
+                              {MENOPAUSE_OPTIONS.map(opt => <SelectItem key={opt} value={opt}>{opt}</SelectItem>)}
                             </SelectContent>
                           </Select>
                         </div>
@@ -191,9 +229,10 @@ export function PredictionDemo() {
                             step="0.1"
                             min={0.1}
                             max={20}
+                            placeholder="0.1–20"
                             className="form-control mt-1 rounded-lg border border-pink-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-100 shadow-sm w-full text-base md:text-lg"
-                            value={formData.cystSize}
-                            onChange={e => setFormData({ ...formData, cystSize: e.target.value })}
+                            value={size}
+                            onChange={e => setSize(Number(e.target.value))}
                             required
                           />
                         </div>
@@ -204,12 +243,13 @@ export function PredictionDemo() {
                           <Input
                             id="cystGrowthRate"
                             type="number"
-                            step="0.1"
-                            min={0}
+                            step="0.01"
+                            min={-5}
                             max={10}
+                            placeholder="-5 to 10"
                             className="form-control mt-1 rounded-lg border border-pink-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-100 shadow-sm w-full text-base md:text-lg"
-                            value={formData.cystGrowthRate}
-                            onChange={e => setFormData({ ...formData, cystGrowthRate: e.target.value })}
+                            value={growth}
+                            onChange={e => setGrowth(Number(e.target.value))}
                             required
                           />
                         </div>
@@ -221,58 +261,57 @@ export function PredictionDemo() {
                         id="ca125"
                         type="number"
                         min={0}
-                        max={1000}
+                        max={2000}
+                        placeholder="0–2000"
                         className="form-control mt-1 rounded-lg border border-pink-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-100 shadow-sm w-full text-base md:text-lg"
-                        value={formData.ca125}
-                        onChange={e => setFormData({ ...formData, ca125: e.target.value })}
+                        value={ca125}
+                        onChange={e => setCa125(Number(e.target.value))}
                         required
                       />
                     </div>
                     <div className="form-group mb-2 w-full">
                       <Label htmlFor="ultrasoundFeatures" className="font-semibold text-base md:text-lg flex items-center gap-2"><FlaskConical className="w-4 h-4 text-rose-400" /> Ultrasound Features</Label>
                       <Select
-                        value={formData.ultrasoundFeatures}
-                        onValueChange={value => setFormData({ ...formData, ultrasoundFeatures: value })}
+                        value={ultrasound}
+                        onValueChange={value => setUltrasound(value)}
                       >
                         <SelectTrigger className="form-control mt-1 rounded-lg border border-pink-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-100 shadow-sm w-full text-base md:text-lg">
                           <SelectValue placeholder="Select feature" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Simple cyst">Simple cyst</SelectItem>
-                          <SelectItem value="Complex cyst">Complex cyst</SelectItem>
-                          <SelectItem value="Solid component">Solid component</SelectItem>
-                          <SelectItem value="Multilocular">Multilocular</SelectItem>
-                          <SelectItem value="With septations">With septations</SelectItem>
+                          {ULTRASOUND_OPTIONS.map(opt => <SelectItem key={opt} value={opt}>{opt}</SelectItem>)}
                         </SelectContent>
                       </Select>
                     </div>
-                    <div className="form-group mb-2 w-full">
-                      <Label htmlFor="symptoms" className="font-semibold text-base md:text-lg flex items-center gap-2"><Stethoscope className="w-4 h-4 text-pink-400" /> Reported Symptoms (comma separated)</Label>
-                      <Input
-                        id="symptoms"
-                        type="text"
-                        className="form-control mt-1 rounded-lg border border-pink-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-100 shadow-sm w-full text-base md:text-lg"
-                        value={formData.symptoms}
-                        onChange={e => setFormData({ ...formData, symptoms: e.target.value })}
-                        required
-                      />
-                      <small className="text-gray-400 text-sm md:text-base">Common symptoms: Pelvic pain, Bloating, Irregular periods, Nausea, Frequent urination</small>
+                    <div className="symptom-group mb-4">
+                      <strong>Reported Symptoms:</strong><br />
+                      {SYMPTOMS.map(symptom => (
+                        <label key={symptom} className="inline-flex items-center mr-4">
+                          <input
+                            type="checkbox"
+                            className="form-checkbox"
+                            checked={symptoms.includes(symptom)}
+                            onChange={() => handleSymptomChange(symptom)}
+                          />
+                          <span className="ml-2">{symptom}</span>
+                        </label>
+                      ))}
                     </div>
                     <Button
                       type="submit"
                       className="submit-btn bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white font-bold text-lg rounded-xl shadow-lg py-4 px-8 w-full sm:w-56 mx-auto block transition-all duration-200 hover:scale-105 hover:shadow-xl justify-center flex"
-                      disabled={isAnalyzing}
+                      disabled={loading}
                     >
-                      {isAnalyzing ? (<span className="flex items-center justify-center gap-2"><Clock className="animate-spin w-5 h-5" /> Processing...</span>) : <span className="w-full text-center">Recommend</span>}
+                      {loading ? (<span className="flex items-center justify-center gap-2"><Clock className="animate-spin w-5 h-5" /> Processing...</span>) : <span className="w-full text-center">Recommend</span>}
                     </Button>
                   </form>
-                  {showResult && (
+                  {result && (
                     <div className="result-container mt-8 p-6 rounded-lg bg-pink-50 border-l-4 border-pink-400 w-full">
-                      <h3 className="result-title text-lg font-bold flex items-center gap-2 text-pink-700 mb-2"><CheckCircle className="w-5 h-5 text-pink-500" /> Recommended Management</h3>
-                      <div className="result-content text-pink-700 text-xl font-semibold">{recommendation}</div>
+                      <h3 className="result-title text-lg font-bold flex items-center gap-2 text-pink-700 mb-2">Prediction Result</h3>
+                      <div className="result-content text-pink-700 text-xl font-semibold">{result}</div>
                     </div>
                   )}
-                </div>
+                </>
               )}
               {activeTab === 'chatbot' && (
                 <div className="chat-container w-full">
