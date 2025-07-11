@@ -522,7 +522,7 @@ export function PredictionDemo() {
         </div>
         {/* Footer */}
         <footer className="text-center py-8 text-pink-400 mt-10 text-base flex items-center justify-center gap-3">
-          <svg className="inline w-6 h-6 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 21C12 21 4 13.5 4 8.5C4 5.42 6.42 3 9.5 3C11.24 3 12.91 3.81 14 5.08C15.09 3.81 16.76 3 18.5 3C21.58 3 24 5.42 24 8.5C24 13.5 16 21 16 21H12Z" fill="#F43F5E" stroke="#F43F5E"/></svg>
+          <img src="/AfyaSasa logo.png" alt="AfyaSasa Logo" className="inline-block h-6 w-6 object-contain rounded-full mr-1" />
           <span className="font-bold text-pink-700 text-lg">AfyaSasa</span>
           <span className="text-pink-400">&copy; {new Date().getFullYear()}</span>
         </footer>

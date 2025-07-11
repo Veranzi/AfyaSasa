@@ -9,7 +9,8 @@ export default function BlogsPage() {
     <div className="min-h-screen bg-white font-sans">
       <Header />
       <div className="max-w-5xl mx-auto pt-40 pb-12 px-2">
-        <h1 className="text-4xl md:text-5xl font-extrabold text-center mb-2">
+        <h1 className="text-4xl md:text-5xl font-extrabold text-center mb-2 flex items-center justify-center gap-3">
+          <img src="/AfyaSasa logo.png" alt="AfyaSasa Logo" className="inline-block h-12 w-12 object-contain rounded-full" />
           <span className="text-gray-800">AfyaSasa </span>
           <span className="text-yellow-600">Blog</span>
           <span className="text-gray-800"> Posts</span>

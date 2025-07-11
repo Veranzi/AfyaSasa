@@ -17,8 +17,8 @@ export function Hero() {
       <div className="relative container mx-auto px-4 py-20 lg:py-32">
         <div className="max-w-4xl mx-auto text-center">
           <div className="flex items-center justify-center gap-2 mb-6">
-            <Heart className="h-8 w-8 text-pink-300" />
-            <span className="text-xl font-semibold text-pink-200">AfyaSasa</span>
+            <img src="/AfyaSasa logo.png" alt="AfyaSasa Logo" className="h-24 w-24 object-contain rounded-full" />
+            <span className="text-2xl md:text-4xl font-semibold text-pink-200">AfyaSasa</span>
           </div>
 
           <h1 className="text-4xl lg:text-6xl font-bold mb-6 leading-tight">
