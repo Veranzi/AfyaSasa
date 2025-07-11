@@ -41,12 +41,16 @@ export function PredictionDemo() {
   const [userInput, setUserInput] = useState("")
   const [isLoadingChat, setIsLoadingChat] = useState(false)
   const [sampleQuestions, setSampleQuestions] = useState([
-    "How many patients are from the Nairobi region?",
-    "What is the average age of post-menopausal patients?",
-    "What is the recommended management for patient OC-1020?",
-    "List all patients with a cyst size greater than 9.5 cm.",
-    "Which patient has the highest CA 125 level, and what is the value?",
-    "What are the most common symptoms reported by pre-menopausal patients?",
+    "What is an ovarian cyst?",
+    "What are the common symptoms of ovarian cysts?",
+    "How are ovarian cysts detected or diagnosed?",
+    "What are the treatment options for ovarian cysts?",
+    "Can ovarian cysts become cancerous?",
+    "How can I manage pain from an ovarian cyst?",
+    "When should I see a doctor about an ovarian cyst?",
+    "Do ovarian cysts affect fertility?",
+    "What causes ovarian cysts to form?",
+    "Are there different types of ovarian cysts?"
   ])
   const [age, setAge] = useState(18)
   const [menopause, setMenopause] = useState(MENOPAUSE_OPTIONS[0])
