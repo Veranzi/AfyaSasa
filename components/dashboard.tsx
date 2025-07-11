@@ -147,7 +147,7 @@ export function Dashboard({ initialTab = 'dashboard' }: DashboardProps) {
           <>
             <div className="mb-8 text-center">
               <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-1">Dashboard</h1>
-              <p className="text-gray-500 text-base md:text-lg">Overview of ovarian cyst prediction and care metrics</p>
+              <p className="text-gray-500 text-base md:text-lg">Overview of ovarian cyst care metrics</p>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
               {/* Key Metrics */}
@@ -181,22 +181,6 @@ export function Dashboard({ initialTab = 'dashboard' }: DashboardProps) {
                       <div className="mt-4 flex items-center text-sm">
                         <Clock className="h-4 w-4 text-yellow-600 mr-1" />
                         <span className="text-yellow-600">{patients.filter(p => p.risk === "High").length} need immediate attention</span>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="shadow-lg">
-                    <CardContent className="p-6">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-medium text-gray-600">Prediction Accuracy</p>
-                          <p className="text-3xl font-bold text-gray-900">94.2%</p>
-                        </div>
-                        <Activity className="h-8 w-8 text-green-600" />
-                      </div>
-                      <div className="mt-4 flex items-center text-sm">
-                        <CheckCircle className="h-4 w-4 text-green-600 mr-1" />
-                        <span className="text-green-600">Above target (90%)</span>
                       </div>
                     </CardContent>
                   </Card>
