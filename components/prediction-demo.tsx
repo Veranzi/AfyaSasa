@@ -10,6 +10,7 @@ import { AlertTriangle, CheckCircle, Clock, TrendingUp, ArrowRight, MapPin, Brai
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useGoogleSheet } from "@/hooks/useGoogleSheet"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 
 const OVARIAN_DATA_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSOrLbxUb6jmar3LIp2tFGHHimYL7Tl6zZTRNqJohoWBaq7sk0UHkxTKPwknP3muI5rx2kE6PwSyrKk/pub?gid=0&single=true&output=csv";
 
@@ -33,7 +34,7 @@ const MENOPAUSE_OPTIONS = [
 ]
 
 export function PredictionDemo() {
-  const [activeTab, setActiveTab] = useState<'prediction' | 'chatbot'>("prediction")
+  const [activeTab, setActiveTab] = useState<'prediction' | 'chatbot' | 'explanation'>("prediction")
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [recommendation, setRecommendation] = useState("")
   const [messages, setMessages] = useState([{ role: "assistant", content: "Hello! I'm your medical assistant. I can answer questions about ovarian cysts and provide information based on medical data. How can I help you today?" }])
@@ -57,7 +58,19 @@ export function PredictionDemo() {
   const [result, setResult] = useState<string>("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string>("")
+  const [llmReport, setLlmReport] = useState("");
+  const [interpretation, setInterpretation] = useState("");
+  const [probabilities, setProbabilities] = useState<{ [label: string]: number } | null>(null);
+  const [predictedClass, setPredictedClass] = useState<string | null>(null);
+  const [confidencePercent, setConfidencePercent] = useState<number | null>(null);
+  const [followupQuestion, setFollowupQuestion] = useState("");
+  const [followupResponse, setFollowupResponse] = useState("");
   const ovarianSheet = useGoogleSheet(OVARIAN_DATA_CSV);
+
+  // Helper for rendering probabilities safely
+  const probabilityEntries: [string, number][] = probabilities
+    ? Object.entries(probabilities).map(([label, prob]) => [label, Number(prob)])
+    : [];
 
   const handleSymptomChange = (symptom: string) => {
     setSymptoms(prev =>
@@ -71,6 +84,12 @@ export function PredictionDemo() {
     e.preventDefault()
     setError("")
     setResult("")
+    setInterpretation("");
+    setLlmReport("");
+    setProbabilities(null);
+    setPredictedClass(null);
+    setConfidencePercent(null);
+    setFollowupResponse("");
     // Range validation
     if (age < 18 || age > 90) {
       setError("Age must be between 18 and 90."); return;
@@ -97,15 +116,32 @@ export function PredictionDemo() {
       ]
     }
     try {
-      const response = await fetch("https://veranziverah.app.modelbit.com/v1/predict_ovarian_cyst_management/latest", {
+      const response = await fetch("https://veranziverah.app.modelbit.com/v1/predict_ovarian_cyst_managementt/latest", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       })
       const data = await response.json()
       if (data.data) {
-        const top = Object.entries(data.data).sort((a, b) => b[1] - a[1])[0]
-        setResult(`Prediction: ${top[0]} (${(top[1] * 100).toFixed(2)}%)`)
+        const { predicted_class, confidence_percent, interpretation, probabilities, llm_report } = data.data;
+        setPredictedClass(predicted_class);
+        setConfidencePercent(confidence_percent);
+        setInterpretation(interpretation);
+        setLlmReport(llm_report);
+        setProbabilities(probabilities);
+        let probText = "";
+        if (probabilities && typeof probabilities === 'object') {
+          probText = "Probabilities:\n";
+          for (const [label, prob] of Object.entries(probabilities)) {
+            probText += `- ${label}: ${(prob * 100).toFixed(2)}%\n`;
+          }
+        }
+        setResult(
+          `Prediction: ${predicted_class}\n` +
+          `Confidence: ${confidence_percent}%\n\n` +
+          `${interpretation ? interpretation.split(". ")[0] + ".\n\n" : ""}` + // show only first sentence
+          probText
+        );
       } else {
         setResult("Error: No prediction returned.")
       }
@@ -113,6 +149,26 @@ export function PredictionDemo() {
       setResult("Error: " + (error instanceof Error ? error.message : String(error)));
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleFollowup = async () => {
+    setFollowupResponse("");
+    if (!predictedClass || !confidencePercent) {
+      setFollowupResponse("Run prediction first.");
+      return;
+    }
+    const payload = { data: [predictedClass, confidencePercent, followupQuestion] };
+    try {
+      const response = await fetch("https://veranziverah.app.modelbit.com/v1/interpret_and_follow_up/latest", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const result = await response.json();
+      setFollowupResponse(result.data?.data?.followup || "No answer returned.");
+    } catch (error) {
+      setFollowupResponse("Error: " + (error instanceof Error ? error.message : String(error)));
     }
   }
 
@@ -124,18 +180,15 @@ export function PredictionDemo() {
     setUserInput("");
     setIsLoadingChat(true);
     try {
-      const res = await fetch("https://ovarian-cyst-detection.onrender.com/chatbot", {
+      const res = await fetch("https://veranziverah.app.modelbit.com/v1/ovarian_cyst_knowledge_assistant/latest", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: currentInput }),
+        body: JSON.stringify({ data: currentInput }),
       });
       const data = await res.json();
       if (res.ok) {
-        const responseText = data.answer || data.response || data.recommended_management || "I apologize, but I'm unable to provide a specific answer at this moment.";
+        const responseText = data.data?.answer?.replaceAll("\n", "\n") || "No answer found.";
         setMessages(prev => [...prev, { role: "assistant", content: responseText }]);
-        if (data.sample_questions && Array.isArray(data.sample_questions)) {
-          setSampleQuestions(data.sample_questions);
-        }
       } else {
         setMessages(prev => [...prev, { role: "assistant", content: "I apologize, but I encountered an error. Please try again." }]);
       }
@@ -152,15 +205,6 @@ export function PredictionDemo() {
         <div className="flex flex-col md:flex-row gap-2 md:gap-4 h-full min-h-[80vh]">
           {/* Sidebar Tabs */}
           <div className="flex flex-row md:flex-col w-full md:w-64 bg-pink-50 rounded-2xl p-2 md:p-4 gap-2 md:gap-4 items-stretch mb-4 md:mb-0">
-            <header className="mb-4 md:mb-8 mt-8">
-              <h1 className="text-2xl md:text-3xl font-extrabold mb-2 bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent flex items-center gap-3">
-                <span>
-                  <svg className="inline w-7 h-7 md:w-8 md:h-8 text-pink-500" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M12 21C12 21 4 13.5 4 8.5C4 5.42 6.42 3 9.5 3C11.24 3 12.91 3.81 14 5.08C15.09 3.81 16.76 3 18.5 3C21.58 3 24 5.42 24 8.5C24 13.5 16 21 16 21H12Z" /></svg>
-                </span>
-                Ovarian Cyst Detection System
-              </h1>
-              <p className="text-base md:text-lg text-gray-500">Advanced diagnostic tool for ovarian cyst assessment and medical guidance</p>
-            </header>
             <div className="flex flex-row md:flex-col gap-2 md:gap-4 w-full mt-4">
               <button
                 className={`tab-btn w-full px-6 py-3 rounded-xl font-semibold shadow transition-all text-lg text-left ${activeTab === 'prediction' ? 'bg-gradient-to-r from-pink-600 to-rose-600 text-white' : 'bg-white text-pink-700 hover:bg-pink-100 border border-pink-200'}`}
@@ -173,6 +217,13 @@ export function PredictionDemo() {
                 onClick={() => setActiveTab('chatbot')}
               >
                 Medical Chatbot
+              </button>
+              <button
+                className={`tab-btn w-full px-6 py-3 rounded-xl font-semibold shadow transition-all text-lg text-left ${activeTab === 'explanation' ? 'bg-gradient-to-r from-pink-600 to-rose-600 text-white' : 'bg-white text-pink-700 hover:bg-pink-100 border border-pink-200'}`}
+                onClick={() => setActiveTab('explanation')}
+                disabled={!result}
+              >
+                Explanation
               </button>
             </div>
           </div>
@@ -308,10 +359,55 @@ export function PredictionDemo() {
                   {result && (
                     <div className="result-container mt-8 p-6 rounded-lg bg-pink-50 border-l-4 border-pink-400 w-full">
                       <h3 className="result-title text-lg font-bold flex items-center gap-2 text-pink-700 mb-2">Prediction Result</h3>
-                      <div className="result-content text-pink-700 text-xl font-semibold">{result}</div>
+                      <pre className="result-content text-pink-700 text-xl font-semibold whitespace-pre-wrap">{result}</pre>
+                      {(interpretation || llmReport) && (
+                        <button className="mt-4 underline text-pink-700 hover:text-pink-900" onClick={() => setActiveTab('explanation')}>
+                          See Explanation
+                        </button>
+                      )}
                     </div>
                   )}
                 </>
+              )}
+              {activeTab === 'explanation' && result && (
+                <div className="explanation-container mt-8 p-6 rounded-lg bg-pink-50 border-l-4 border-pink-400 w-full">
+                  <h3 className="text-lg font-bold flex items-center gap-2 text-pink-700 mb-2">Clinical Explanation & Report</h3>
+                  <div className="mb-4">
+                    <strong>Interpretation:</strong>
+                    <div className="whitespace-pre-wrap">{interpretation}</div>
+                  </div>
+                  {probabilityEntries.length > 0 && (
+                    <div className="mb-4">
+                      <strong>Probabilities:</strong>
+                      <pre className="whitespace-pre-wrap">
+                        {probabilityEntries.map(([label, prob]) =>
+                          `- ${label}: ${(prob * 100).toFixed(2)}%`
+                        ).join("\n")}
+                      </pre>
+                    </div>
+                  )}
+                  {llmReport && (
+                    <div className="mb-4">
+                      <strong>🧠 Clinical LLM Report:</strong>
+                      <div className="whitespace-pre-wrap">{llmReport}</div>
+                    </div>
+                  )}
+                  {/* Follow-up Section */}
+                  <div className="followup mt-8">
+                    <h4 className="font-bold mb-2">🔁 Clinician Follow-up</h4>
+                    <div className="flex flex-col sm:flex-row gap-2 mb-2">
+                      <input
+                        type="text"
+                        className="border rounded px-2 py-1 flex-1"
+                        placeholder="Enter a follow-up question"
+                        value={followupQuestion}
+                        onChange={e => setFollowupQuestion(e.target.value)}
+                      />
+                      <Button type="button" onClick={handleFollowup}>Ask</Button>
+                    </div>
+                    <pre className="bg-gray-100 border p-2 whitespace-pre-wrap min-h-[40px]">{followupResponse}</pre>
+                  </div>
+                </div>
               )}
               {activeTab === 'chatbot' && (
                 <div className="chat-container w-full">
