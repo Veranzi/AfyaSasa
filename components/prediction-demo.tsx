@@ -53,7 +53,7 @@ export function PredictionDemo() {
     "What causes ovarian cysts to form?",
     "Are there different types of ovarian cysts?"
   ])
-  const [age, setAge] = useState(18)
+  const [age, setAge] = useState(12)
   const [menopause, setMenopause] = useState(MENOPAUSE_OPTIONS[0])
   const [size, setSize] = useState(1)
   const [growth, setGrowth] = useState(0)
@@ -74,6 +74,7 @@ export function PredictionDemo() {
   const [patientName, setPatientName] = useState("");
   const [patientId, setPatientId] = useState("");
   const printRef = useRef<HTMLDivElement>(null);
+  const [othersSymptom, setOthersSymptom] = useState(false);
 
   // Helper for rendering probabilities safely
   const probabilityEntries: [string, number][] = probabilities
@@ -99,8 +100,8 @@ export function PredictionDemo() {
     setConfidencePercent(null);
     setFollowupResponse("");
     // Range validation
-    if (age < 18 || age > 90) {
-      setError("Age must be between 18 and 90."); return;
+    if (age < 12 || age > 90) {
+      setError("Age must be between 12 and 90."); return;
     }
     if (size < 0.1 || size > 20) {
       setError("Cyst size must be between 0.1 and 20 cm."); return;
@@ -279,9 +280,9 @@ export function PredictionDemo() {
                           <Input
                             id="age"
                             type="number"
-                            min={18}
+                            min={12}
                             max={90}
-                            placeholder="18–90"
+                            placeholder="12–90"
                             className="form-control mt-1 rounded-lg border border-pink-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-100 shadow-sm w-full text-base md:text-lg"
                             value={age}
                             onChange={e => setAge(Number(e.target.value))}
@@ -383,6 +384,15 @@ export function PredictionDemo() {
                           <span className="ml-2">{symptom}</span>
                         </label>
                       ))}
+                      <label className="inline-flex items-center mr-4">
+                        <input
+                          type="checkbox"
+                          className="form-checkbox"
+                          checked={othersSymptom}
+                          onChange={() => setOthersSymptom(v => !v)}
+                        />
+                        <span className="ml-2">Others</span>
+                      </label>
                     </div>
                     <Button
                       type="submit"
