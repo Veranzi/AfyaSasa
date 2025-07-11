@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useGoogleSheet } from "@/hooks/useGoogleSheet"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
+import React, { useRef } from "react"
 
 const OVARIAN_DATA_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSOrLbxUb6jmar3LIp2tFGHHimYL7Tl6zZTRNqJohoWBaq7sk0UHkxTKPwknP3muI5rx2kE6PwSyrKk/pub?gid=0&single=true&output=csv";
 
@@ -70,6 +71,9 @@ export function PredictionDemo() {
   const [followupQuestion, setFollowupQuestion] = useState("");
   const [followupResponse, setFollowupResponse] = useState("");
   const ovarianSheet = useGoogleSheet(OVARIAN_DATA_CSV);
+  const [patientName, setPatientName] = useState("");
+  const [patientId, setPatientId] = useState("");
+  const printRef = useRef<HTMLDivElement>(null);
 
   // Helper for rendering probabilities safely
   const probabilityEntries: [string, number][] = probabilities
@@ -243,6 +247,34 @@ export function PredictionDemo() {
                     <div className="form-row flex flex-col md:flex-row gap-4 md:gap-6 mb-2 w-full">
                       <div className="form-col flex-1 min-w-0 w-full">
                         <div className="form-group mb-2 w-full">
+                          <Label htmlFor="patientName" className="font-semibold text-base md:text-lg flex items-center gap-2">Patient Name</Label>
+                          <Input
+                            id="patientName"
+                            type="text"
+                            placeholder="Enter patient name"
+                            className="form-control mt-1 rounded-lg border border-pink-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-100 shadow-sm w-full text-base md:text-lg"
+                            value={patientName}
+                            onChange={e => setPatientName(e.target.value)}
+                          />
+                        </div>
+                      </div>
+                      <div className="form-col flex-1 min-w-0 w-full">
+                        <div className="form-group mb-2 w-full">
+                          <Label htmlFor="patientId" className="font-semibold text-base md:text-lg flex items-center gap-2">Patient ID</Label>
+                          <Input
+                            id="patientId"
+                            type="text"
+                            placeholder="Enter patient ID"
+                            className="form-control mt-1 rounded-lg border border-pink-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-100 shadow-sm w-full text-base md:text-lg"
+                            value={patientId}
+                            onChange={e => setPatientId(e.target.value)}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="form-row flex flex-col md:flex-row gap-4 md:gap-6 mb-2 w-full">
+                      <div className="form-col flex-1 min-w-0 w-full">
+                        <div className="form-group mb-2 w-full">
                           <Label htmlFor="age" className="font-semibold text-base md:text-lg flex items-center gap-2"><User className="w-4 h-4 text-pink-500" /> Age</Label>
                           <Input
                             id="age"
@@ -374,7 +406,26 @@ export function PredictionDemo() {
                 </>
               )}
               {activeTab === 'explanation' && result && (
-                <div className="explanation-container mt-8 p-6 rounded-lg bg-pink-50 border-l-4 border-pink-400 w-full">
+                <div className="explanation-container mt-8 p-6 rounded-lg bg-pink-50 border-l-4 border-pink-400 w-full" id="print-section" ref={printRef}>
+                  <div className="mb-4 flex flex-col md:flex-row md:items-center md:gap-8">
+                    <div><strong>Patient Name:</strong> {patientName || <span className="italic text-gray-400">N/A</span>}</div>
+                    <div><strong>Patient ID:</strong> {patientId || <span className="italic text-gray-400">N/A</span>}</div>
+                  </div>
+                  <button
+                    className="mb-4 ml-auto block bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white font-bold py-2 px-6 rounded-lg shadow-lg print:hidden"
+                    onClick={() => {
+                      const printContents = document.getElementById('print-section')?.innerHTML;
+                      const originalContents = document.body.innerHTML;
+                      if (printContents) {
+                        document.body.innerHTML = printContents;
+                        window.print();
+                        document.body.innerHTML = originalContents;
+                        window.location.reload();
+                      }
+                    }}
+                  >
+                    Print
+                  </button>
                   <h3 className="text-lg font-bold flex items-center gap-2 text-pink-700 mb-2">Clinical Explanation & Report</h3>
                   <div className="mb-4">
                     <strong>Interpretation:</strong>
