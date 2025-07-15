@@ -1,8 +1,8 @@
 "use client"
 import { useState } from "react";
-import { Heart } from "lucide-react";
+import { Heart, Eye, EyeOff } from "lucide-react";
 import { auth } from "@/lib/firebase";
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { db } from "@/lib/firebase";
 import { getDoc, setDoc, doc } from "firebase/firestore";
@@ -14,6 +14,8 @@ export default function SignupPage() {
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [resetMessage, setResetMessage] = useState("");
   const router = useRouter();
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value);
@@ -85,6 +87,20 @@ export default function SignupPage() {
       setError(err.message || "Google sign-in failed");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    setResetMessage("");
+    if (!email) {
+      setError("Please enter your email above first.");
+      return;
+    }
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setResetMessage("Password reset email sent! Check your inbox.");
+    } catch (err) {
+      setError("Failed to send reset email.");
     }
   };
 
@@ -167,10 +183,37 @@ export default function SignupPage() {
               <label className="block text-sm font-medium text-pink-700 mb-1">Email</label>
               <input type="email" className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400" placeholder="you@email.com" value={email} onChange={handleEmailChange} required />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-pink-700 mb-1">Password</label>
-              <input type="password" className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400" placeholder="Password" value={password} onChange={handlePasswordChange} required />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400 pr-10"
+                placeholder={tab === 'signup' ? 'e.g. Afya@2024' : 'Password'}
+                value={password}
+                onChange={handlePasswordChange}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+                tabIndex={-1}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
             </div>
+            {tab === 'login' && (
+              <p className="text-right mt-2">
+                <button
+                  type="button"
+                  className="text-pink-600 hover:underline text-sm"
+                  onClick={handleForgotPassword}
+                >
+                  Forgot password?
+                </button>
+              </p>
+            )}
+            {resetMessage && <p className="text-green-600 text-center mt-2 text-sm font-semibold">{resetMessage}</p>}
             <button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-pink-500 to-rose-400 text-white font-bold py-2 rounded-lg shadow hover:from-pink-600 hover:to-rose-500 transition disabled:opacity-60">
               {loading ? (tab === 'login' ? 'Logging in...' : 'Signing up...') : (tab === 'login' ? 'Login' : 'Sign Up')}
             </button>
