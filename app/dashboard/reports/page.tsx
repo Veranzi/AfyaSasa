@@ -8,6 +8,10 @@ export default function ReportsPage() {
   const [reports, setReports] = useState<any[]>([]);
   // Optionally, add fetching logic here if needed
 
+  if (!reports) {
+    return <div className="p-8 text-center">Loading reports...</div>;
+  }
+
   return (
     <RoleGuard allowed={["clinician", "admin"]}>
       <div className="max-w-2xl mx-auto p-8">

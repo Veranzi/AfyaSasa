@@ -20,21 +20,25 @@ export default function InventoryPage() {
   const [categoryFilter, setCategoryFilter] = useState("");
 
   // Derive unique facilities and categories from inventory
-  const facilities = Array.from(new Set(inventory.map((item: any) => item.location)));
-  const categories = Array.from(new Set(inventory.map((item: any) => item.category)));
+  const facilities = Array.from(new Set((inventory || []).map((item: any) => item.location)));
+  const categories = Array.from(new Set((inventory || []).map((item: any) => item.category)));
 
   // Filtered inventory
-  const filteredInventory = inventory.filter((item: any) =>
+  const filteredInventory = (inventory || []).filter((item: any) =>
     (!facilityFilter || item.location === facilityFilter) &&
     (!categoryFilter || item.category === categoryFilter)
   );
 
-  // Calculate summary stats
-  const totalItems = inventory.length;
-  const lowStockItems = inventory.filter((item: any) => item.status === "low").length;
-  const criticalItems = inventory.filter((item: any) => item.status === "critical").length;
-  const restockOrders = inventory.filter((item: any) => item.restock === "yes").length;
-  const inventoryValue = inventory.reduce((sum: number, item: any) => sum + (parseFloat(item.cost) * parseInt(item.stock)), 0);
+  // Calculate summary stats with loading guards
+  const totalItems = loading ? 0 : (inventory || []).length;
+  const lowStockItems = loading ? 0 : (inventory || []).filter((item: any) => item.status === "low").length;
+  const criticalItems = loading ? 0 : (inventory || []).filter((item: any) => item.status === "critical").length;
+  const restockOrders = loading ? 0 : (inventory || []).filter((item: any) => item.restock === "yes").length;
+  const inventoryValue = loading ? 0 : (inventory || []).reduce((sum: number, item: any) => sum + (parseFloat(item.cost) * parseInt(item.stock)), 0);
+
+  if (loading) {
+    return <div className="p-8 text-center">Loading inventory...</div>;
+  }
 
   return (
     <RoleGuard allowed={["clinician", "admin"]}>

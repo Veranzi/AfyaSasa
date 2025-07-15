@@ -1,7 +1,8 @@
 "use client";
 import { useState } from "react";
 import bookingData from "./booking-form.json";
-import ClinicMapSelector from "@/components/ClinicMapSelector";
+import dynamic from "next/dynamic";
+const ClinicMapSelector = dynamic(() => import("@/components/ClinicMapSelector"), { ssr: false });
 
 export default function AppointmentBookingForm({ onBook }: { onBook: (summary: any) => void }) {
   // Step state
