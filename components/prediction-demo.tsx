@@ -284,8 +284,8 @@ export function PredictionDemo() {
                             max={90}
                             placeholder="12–90"
                             className="form-control mt-1 rounded-lg border border-pink-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-100 shadow-sm w-full text-base md:text-lg"
-                            value={age}
-                            onChange={e => setAge(Number(e.target.value))}
+                            value={age === 0 ? "" : age}
+                            onChange={e => setAge(e.target.value === "" ? 0 : Number(e.target.value))}
                             required
                           />
                         </div>
@@ -319,8 +319,8 @@ export function PredictionDemo() {
                             max={20}
                             placeholder="0.1–20"
                             className="form-control mt-1 rounded-lg border border-pink-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-100 shadow-sm w-full text-base md:text-lg"
-                            value={size}
-                            onChange={e => setSize(Number(e.target.value))}
+                            value={size === 0 ? "" : size}
+                            onChange={e => setSize(e.target.value === "" ? 0 : Number(e.target.value))}
                             required
                           />
                         </div>
@@ -336,8 +336,8 @@ export function PredictionDemo() {
                             max={10}
                             placeholder="-5 to 10"
                             className="form-control mt-1 rounded-lg border border-pink-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-100 shadow-sm w-full text-base md:text-lg"
-                            value={growth}
-                            onChange={e => setGrowth(Number(e.target.value))}
+                            value={growth === 0 ? "" : growth}
+                            onChange={e => setGrowth(e.target.value === "" ? 0 : Number(e.target.value))}
                             required
                           />
                         </div>
@@ -352,8 +352,8 @@ export function PredictionDemo() {
                         max={2000}
                         placeholder="0–2000"
                         className="form-control mt-1 rounded-lg border border-pink-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-100 shadow-sm w-full text-base md:text-lg"
-                        value={ca125}
-                        onChange={e => setCa125(Number(e.target.value))}
+                        value={ca125 === 0 ? "" : ca125}
+                        onChange={e => setCa125(e.target.value === "" ? 0 : Number(e.target.value))}
                         required
                       />
                     </div>

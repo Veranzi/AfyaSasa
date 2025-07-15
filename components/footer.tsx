@@ -136,8 +136,8 @@ export function Footer() {
                   <Mail className="h-4 w-4 text-pink-400" />
                   <div>
                     <p className="text-xs text-gray-400 uppercase tracking-wide">Email</p>
-                    <a href="mailto:info@afyasasa.com" className="font-medium">
-                      info@afyasasa.com
+                    <a href="mailto:afyasasa2025@gmail.com" className="font-medium">
+                      afyasasa2025@gmail.com
                     </a>
                   </div>
                 </div>

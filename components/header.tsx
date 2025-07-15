@@ -8,6 +8,7 @@ import { useRouter, usePathname } from "next/navigation"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { auth } from "@/lib/firebase"
 import { signOut, User } from "firebase/auth"
+import { useUserRole } from "@/hooks/useUserRole";
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -21,6 +22,8 @@ export function Header() {
     })
     return () => unsubscribe()
   }, [])
+
+  const { role, loading } = useUserRole(user);
 
   const handleSignOut = async () => {
     await signOut(auth)
@@ -99,10 +102,13 @@ export function Header() {
             >
               Features
             </button>
-            <Link href="/demo" className={`text-gray-700 hover:text-pink-600 font-medium transition-colors ${isDemo ? "underline underline-offset-4 text-pink-600" : ""}`}>
-              Live Demo
-            </Link>
-            {user && (
+            {/* Only show Live Demo for clinician and admin */}
+            {role === "clinician" || role === "admin" ? (
+              <Link href="/demo" className={`text-gray-700 hover:text-pink-600 font-medium transition-colors ${isDemo ? "underline underline-offset-4 text-pink-600" : ""}`}>
+                Live Demo
+              </Link>
+            ) : null}
+            {user && !loading && (
               <div className="relative group">
                 <button className={`text-gray-700 hover:text-pink-600 font-medium transition-colors flex items-center gap-1 bg-transparent border-0 cursor-pointer ${isDashboard ? "underline underline-offset-4 text-pink-600" : ""}`}
                   tabIndex={0}
@@ -111,14 +117,49 @@ export function Header() {
                   <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
                 </button>
                 <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
-                  <Link href="/dashboard" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Overview</Link>
-                  <Link href="/dashboard/analytics" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Analytics</Link>
-                  <Link href="/dashboard/inventory" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Inventory</Link>
-                  <Link href="/dashboard/patients" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Patients</Link>
-                  <Link href="/dashboard/reports" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Reports</Link>
-                  <Link href="/dashboard/settings" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Settings</Link>
-                  <Link href="/dashboard/treatment" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Treatment</Link>
-                  <Link href="/dashboard/notifications" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Notifications</Link>
+                  {/* Show dashboard links based on role */}
+                  {role === "patient" && (
+                    <>
+                      <Link href="/dashboard/chatbot" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Medical Chatbot</Link>
+                      <Link href="/dashboard/appointments" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Appointments</Link>
+                      <Link href="/dashboard/reminders" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Reminders</Link>
+                      <Link href="/blogs" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Blogs</Link>
+                    </>
+                  )}
+                  {role === "clinician" && (
+                    <>
+                      <Link href="/dashboard" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Overview</Link>
+                      <Link href="/dashboard/analytics" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Analytics</Link>
+                      <Link href="/dashboard/inventory" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Inventory</Link>
+                      <Link href="/dashboard/patients" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Patients</Link>
+                      <Link href="/dashboard/reports" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Reports</Link>
+                      <Link href="/dashboard/settings" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Settings</Link>
+                      <Link href="/dashboard/treatment" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Treatment</Link>
+                      <Link href="/dashboard/notifications" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Notifications</Link>
+                      <Link href="/dashboard/appointments/clinician-page" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Manage Appointments</Link>
+                      <Link href="/dashboard/reminders/clinician-page" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Manage Reminders</Link>
+                      <Link href="/dashboard/reports/clinician-page" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Manage Reports</Link>
+                    </>
+                  )}
+                  {role === "admin" && (
+                    <>
+                      <Link href="/dashboard" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Overview</Link>
+                      <Link href="/dashboard/analytics" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Analytics</Link>
+                      <Link href="/dashboard/inventory" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Inventory</Link>
+                      <Link href="/dashboard/patients" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Patients</Link>
+                      <Link href="/dashboard/reports" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Reports</Link>
+                      <Link href="/dashboard/settings" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Settings</Link>
+                      <Link href="/dashboard/treatment" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Treatment</Link>
+                      <Link href="/dashboard/notifications" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Notifications</Link>
+                      <Link href="/dashboard/chatbot" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Medical Chatbot</Link>
+                      <Link href="/dashboard/appointments" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Appointments</Link>
+                      <Link href="/dashboard/reminders" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Reminders</Link>
+                      <Link href="/blogs" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Blogs</Link>
+                      <Link href="/dashboard/appointments/clinician-page" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Manage Appointments</Link>
+                      <Link href="/dashboard/reminders/clinician-page" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Manage Reminders</Link>
+                      <Link href="/dashboard/reports/clinician-page" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Manage Reports</Link>
+                    </>
+                  )}
                 </div>
               </div>
             )}
@@ -148,17 +189,20 @@ export function Header() {
           <div className="lg:hidden py-4 border-t border-pink-50">
             <nav className="flex flex-col gap-4">
               <button onClick={() => { setIsMenuOpen(false); handleSectionNav("home") }}
-                className={`text-gray-700 hover:text-pink-600 font-medium transition-colors py-2 bg-transparent border-0 text-left cursor-pointer ${isHome ? "underline underline-offset-4 text-pink-600" : ""}`}>
+                className={`text-gray-700 hover:text-pink-600 font-medium transition-colors py-2 bg-transparent border-0 text-left cursor-pointer ${isHome ? "underline underline-offset-4 text-pink-600" : ""}`}> 
                 Home
               </button>
               <button onClick={() => { setIsMenuOpen(false); handleSectionNav("features") }}
-                className={`text-gray-700 hover:text-pink-600 font-medium transition-colors py-2 bg-transparent border-0 text-left cursor-pointer ${isFeatures ? "underline underline-offset-4 text-pink-600" : ""}`}>
+                className={`text-gray-700 hover:text-pink-600 font-medium transition-colors py-2 bg-transparent border-0 text-left cursor-pointer ${isFeatures ? "underline underline-offset-4 text-pink-600" : ""}`}> 
                 Features
               </button>
-              <Link href="/demo" className={`text-gray-700 hover:text-pink-600 font-medium transition-colors py-2 ${isDemo ? "underline underline-offset-4 text-pink-600" : ""}`}>
-                Live Demo
-              </Link>
-              {user && (
+              {/* Only show Live Demo for clinician and admin */}
+              {role === "clinician" || role === "admin" ? (
+                <Link href="/demo" className={`text-gray-700 hover:text-pink-600 font-medium transition-colors py-2 ${isDemo ? "underline underline-offset-4 text-pink-600" : ""}`}>
+                  Live Demo
+                </Link>
+              ) : null}
+              {user && !loading && (
                 <div className="relative group">
                   <button className={`text-gray-700 hover:text-pink-600 font-medium transition-colors flex items-center gap-1 bg-transparent border-0 cursor-pointer py-2 ${isDashboard ? "underline underline-offset-4 text-pink-600" : ""}`}
                     tabIndex={0}
@@ -167,14 +211,49 @@ export function Header() {
                     <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
                   </button>
                   <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
-                    <Link href="/dashboard" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Overview</Link>
-                    <Link href="/dashboard/analytics" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Analytics</Link>
-                    <Link href="/dashboard/inventory" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Inventory</Link>
-                    <Link href="/dashboard/patients" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Patients</Link>
-                    <Link href="/dashboard/reports" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Reports</Link>
-                    <Link href="/dashboard/settings" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Settings</Link>
-                    <Link href="/dashboard/treatment" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Treatment</Link>
-                    <Link href="/dashboard/notifications" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Notifications</Link>
+                    {/* Show dashboard links based on role */}
+                    {role === "patient" && (
+                      <>
+                        <Link href="/dashboard/chatbot" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Medical Chatbot</Link>
+                        <Link href="/dashboard/appointments" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Appointments</Link>
+                        <Link href="/dashboard/reminders" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Reminders</Link>
+                        <Link href="/blogs" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Blogs</Link>
+                      </>
+                    )}
+                    {role === "clinician" && (
+                      <>
+                        <Link href="/dashboard" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Overview</Link>
+                        <Link href="/dashboard/analytics" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Analytics</Link>
+                        <Link href="/dashboard/inventory" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Inventory</Link>
+                        <Link href="/dashboard/patients" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Patients</Link>
+                        <Link href="/dashboard/reports" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Reports</Link>
+                        <Link href="/dashboard/settings" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Settings</Link>
+                        <Link href="/dashboard/treatment" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Treatment</Link>
+                        <Link href="/dashboard/notifications" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Notifications</Link>
+                        <Link href="/dashboard/appointments/clinician-page" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Manage Appointments</Link>
+                        <Link href="/dashboard/reminders/clinician-page" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Manage Reminders</Link>
+                        <Link href="/dashboard/reports/clinician-page" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Manage Reports</Link>
+                      </>
+                    )}
+                    {role === "admin" && (
+                      <>
+                        <Link href="/dashboard" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Overview</Link>
+                        <Link href="/dashboard/analytics" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Analytics</Link>
+                        <Link href="/dashboard/inventory" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Inventory</Link>
+                        <Link href="/dashboard/patients" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Patients</Link>
+                        <Link href="/dashboard/reports" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Reports</Link>
+                        <Link href="/dashboard/settings" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Settings</Link>
+                        <Link href="/dashboard/treatment" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Treatment</Link>
+                        <Link href="/dashboard/notifications" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Notifications</Link>
+                        <Link href="/dashboard/chatbot" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Medical Chatbot</Link>
+                        <Link href="/dashboard/appointments" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Appointments</Link>
+                        <Link href="/dashboard/reminders" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Reminders</Link>
+                        <Link href="/blogs" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Blogs</Link>
+                        <Link href="/dashboard/appointments/clinician-page" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Manage Appointments</Link>
+                        <Link href="/dashboard/reminders/clinician-page" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Manage Reminders</Link>
+                        <Link href="/dashboard/reports/clinician-page" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Manage Reports</Link>
+                      </>
+                    )}
                   </div>
                 </div>
               )}

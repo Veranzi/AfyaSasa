@@ -4,6 +4,8 @@ import { Heart } from "lucide-react";
 import { auth } from "@/lib/firebase";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { useRouter } from "next/navigation";
+import { db } from "@/lib/firebase";
+import { getDoc, setDoc, doc } from "firebase/firestore";
 
 export default function SignupPage() {
   const [tab, setTab] = useState<'login' | 'signup'>('login');
@@ -24,7 +26,15 @@ export default function SignupPage() {
     setError("");
     try {
       if (tab === "signup") {
-        await createUserWithEmailAndPassword(auth, email, password);
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        await setDoc(doc(db, "users", user.uid), {
+          uid: user.uid,
+          email: user.email,
+          name: name,
+          role: "patient",
+          createdAt: new Date().toISOString(),
+        });
       } else {
         await signInWithEmailAndPassword(auth, email, password);
       }
@@ -41,7 +51,19 @@ export default function SignupPage() {
     setError("");
     try {
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      // Check if user doc exists
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      if (!userDoc.exists()) {
+        await setDoc(doc(db, "users", user.uid), {
+          uid: user.uid,
+          email: user.email,
+          name: user.displayName || "",
+          role: "patient",
+          createdAt: new Date().toISOString(),
+        });
+      }
       router.replace("/demo");
     } catch (err: any) {
       setError(err.message || "Google sign-in failed");

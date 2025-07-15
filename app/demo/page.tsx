@@ -5,6 +5,7 @@ import { PredictionDemo } from "@/components/prediction-demo"
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { auth } from "@/lib/firebase"
+import RoleGuard from "@/components/RoleGuard";
 
 export default function DemoPage() {
   const router = useRouter()
@@ -18,11 +19,13 @@ export default function DemoPage() {
   }, [router])
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      <Header />
-      <div className="pt-24">
-        <PredictionDemo />
+    <RoleGuard allowed={["clinician", "admin"]}>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+        <Header />
+        <div className="pt-24">
+          <PredictionDemo />
+        </div>
       </div>
-    </div>
+    </RoleGuard>
   )
 } 
