@@ -25,9 +25,10 @@ export default function SignupPage() {
     setLoading(true);
     setError("");
     try {
+      let user;
       if (tab === "signup") {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
+        user = userCredential.user;
         await setDoc(doc(db, "users", user.uid), {
           uid: user.uid,
           email: user.email,
@@ -36,9 +37,17 @@ export default function SignupPage() {
           createdAt: new Date().toISOString(),
         });
       } else {
-        await signInWithEmailAndPassword(auth, email, password);
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        user = userCredential.user;
       }
-      router.replace("/demo");
+      // Fetch user role
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      const role = userDoc.exists() ? userDoc.data().role : "patient";
+      if (role === "admin") {
+        router.replace("/dashboard");
+      } else {
+        router.replace("/dashboard/chatbot");
+      }
     } catch (err: any) {
       setError(err.message || "Authentication failed");
     } finally {
@@ -64,7 +73,14 @@ export default function SignupPage() {
           createdAt: new Date().toISOString(),
         });
       }
-      router.replace("/demo");
+      // Fetch user role
+      const updatedUserDoc = await getDoc(doc(db, "users", user.uid));
+      const role = updatedUserDoc.exists() ? updatedUserDoc.data().role : "patient";
+      if (role === "admin") {
+        router.replace("/dashboard");
+      } else {
+        router.replace("/dashboard/chatbot");
+      }
     } catch (err: any) {
       setError(err.message || "Google sign-in failed");
     } finally {
