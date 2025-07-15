@@ -128,7 +128,7 @@ export default function AppointmentBookingForm({ onBook }: { onBook: (summary: a
             )}
             <button className="bg-pink-500 text-white px-4 py-2 rounded" onClick={handleNext1}>Next</button>
           </div>
-          <div className="flex-1 md:flex-[1.8] bg-white rounded-xl shadow p-4 min-h-[500px] flex flex-col justify-center">
+          <div className="flex-1 md:flex-[1.8] bg-white rounded-xl shadow p-4 flex flex-col justify-center">
             <label className="block font-medium mb-1">Or select a clinic from the map</label>
             <ClinicMapSelector onSelect={handleMapClinicSelect} />
             {selectedClinicMap && (

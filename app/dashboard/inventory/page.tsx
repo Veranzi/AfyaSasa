@@ -12,6 +12,15 @@ import RoleGuard from "@/components/RoleGuard";
 const INVENTORY_DATA_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSOrLbxUb6jmar3LIp2tFGHHimYL7Tl6zZTRNqJohoWBaq7sk0UHkxTKPwknP3muI5rx2kE6PwSyrKk/pub?gid=1858485866&single=true&output=csv";
 
 export default function InventoryPage() {
+  const { data: inventory, loading } = useGoogleSheet(INVENTORY_DATA_CSV);
+
+  // Calculate summary stats
+  const totalItems = inventory.length;
+  const lowStockItems = inventory.filter((item: any) => item.status === "low").length;
+  const criticalItems = inventory.filter((item: any) => item.status === "critical").length;
+  const restockOrders = inventory.filter((item: any) => item.restock === "yes").length;
+  const inventoryValue = inventory.reduce((sum: number, item: any) => sum + (parseFloat(item.cost) * parseInt(item.stock)), 0);
+
   return (
     <RoleGuard allowed={["clinician", "admin"]}>
       <div className="flex-1 space-y-4 p-8 pt-6">

@@ -31,14 +31,15 @@ export default function ClinicMapSelector({ onSelect }: { onSelect: (clinic: any
   };
 
   return (
-    <div>
+    <div className="w-full h-[400px] md:h-[500px]" style={{ minHeight: 400 }}>
       <button onClick={handleUseMyLocation} className="mb-2 bg-blue-600 text-white px-4 py-2 rounded">
         Use My Current Location
       </button>
       <MapContainer
         center={userPos || [-1.2921, 36.8219]} // Default: Nairobi
         zoom={13}
-        style={{ width: "100%", height: "500px", minHeight: "400px", borderRadius: "1rem" }}
+        className="w-full h-full rounded-xl"
+        style={{ width: "100%", height: "100%", minHeight: 400, borderRadius: "1rem" }}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
