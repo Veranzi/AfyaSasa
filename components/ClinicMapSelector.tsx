@@ -22,7 +22,7 @@ export default function ClinicMapSelector({ onSelect }: { onSelect: (clinic: any
   const [userPos, setUserPos] = useState<[number, number] | null>(null);
 
   const handleUseMyLocation = () => {
-    if (navigator.geolocation) {
+    if (typeof window !== "undefined" && typeof navigator !== "undefined" && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => setUserPos([pos.coords.latitude, pos.coords.longitude]),
         () => alert("Could not get your location")

@@ -5,6 +5,9 @@ import { collection, query, where, getDocs, orderBy } from "firebase/firestore";
 import RoleGuard from "@/components/RoleGuard";
 
 export default function ReportsPage() {
+  const [reports, setReports] = useState<any[]>([]);
+  // Optionally, add fetching logic here if needed
+
   return (
     <RoleGuard allowed={["clinician", "admin"]}>
       <div className="max-w-2xl mx-auto p-8">

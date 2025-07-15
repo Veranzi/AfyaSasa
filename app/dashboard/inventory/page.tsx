@@ -14,6 +14,21 @@ const INVENTORY_DATA_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSOr
 export default function InventoryPage() {
   const { data: inventory, loading } = useGoogleSheet(INVENTORY_DATA_CSV);
 
+  // Add missing state for showFilter and filters
+  const [showFilter, setShowFilter] = useState(false);
+  const [facilityFilter, setFacilityFilter] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
+
+  // Derive unique facilities and categories from inventory
+  const facilities = Array.from(new Set(inventory.map((item: any) => item.location)));
+  const categories = Array.from(new Set(inventory.map((item: any) => item.category)));
+
+  // Filtered inventory
+  const filteredInventory = inventory.filter((item: any) =>
+    (!facilityFilter || item.location === facilityFilter) &&
+    (!categoryFilter || item.category === categoryFilter)
+  );
+
   // Calculate summary stats
   const totalItems = inventory.length;
   const lowStockItems = inventory.filter((item: any) => item.status === "low").length;
