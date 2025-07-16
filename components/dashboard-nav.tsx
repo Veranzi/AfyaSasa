@@ -175,19 +175,19 @@ export function DashboardNav() {
       {
         label: "Manage Appointments",
         icon: Calendar,
-        href: "/dashboard/appointments/clinician-page",
+        href: "/dashboard/appointments/admin-page",
         color: "text-blue-800",
       },
       {
         label: "Manage Reminders",
         icon: AlarmClock,
-        href: "/dashboard/reminders/clinician-page",
+        href: "/dashboard/reminders/admin-page",
         color: "text-amber-800",
       },
       {
         label: "Manage Reports",
         icon: FileText,
-        href: "/dashboard/reports/clinician-page",
+        href: "/dashboard/reports/admin-page",
         color: "text-emerald-800",
       },
     ];

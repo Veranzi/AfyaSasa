@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import RoleGuard from "@/components/RoleGuard";
 
 const DUMMY_APPOINTMENTS = [
@@ -19,6 +19,43 @@ const DUMMY_APPOINTMENTS = [
 
 export default function RemindersPage() {
   const [appointments, setAppointments] = useState(DUMMY_APPOINTMENTS);
+  const [role, setRole] = useState<"patient" | "admin" | null>(null);
+
+  useEffect(() => {
+    const userRole = localStorage.getItem("userRole");
+    setRole(userRole as "patient" | "admin" | null);
+  }, []);
+
+  useEffect(() => {
+    if (role === "admin") {
+      setAppointments([
+        {
+          id: 101,
+          doctor: "Dr. Jane Demo",
+          specialist: "Gynecologist",
+          date: "2025-07-22",
+          time: "10:00 AM",
+          clinic: "Demo Clinic",
+          mode: "In-person",
+          reminderTime: "2025-07-21T10:00:00",
+          reminderSMS: true,
+          reminderEmail: false,
+        },
+        {
+          id: 102,
+          doctor: "Dr. Alice Demo",
+          specialist: "Gynecologist",
+          date: "2025-07-23",
+          time: "02:00 PM",
+          clinic: "Demo Clinic",
+          mode: "Virtual",
+          reminderTime: "2025-07-22T14:00:00",
+          reminderSMS: false,
+          reminderEmail: true,
+        },
+      ]);
+    }
+  }, [role]);
 
   const handleToggle = (id: number, type: "sms" | "email") => {
     setAppointments(appts => appts.map(a => a.id === id ? { ...a, [type === "sms" ? "reminderSMS" : "reminderEmail"]: !a[type === "sms" ? "reminderSMS" : "reminderEmail"] } : a));

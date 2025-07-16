@@ -176,7 +176,9 @@ export default function InventoryPage() {
                     </div>
                     <div className="text-xs text-gray-500">Threshold: {item.threshold} units</div>
                     <div className="text-xs text-gray-500">Last Restock: {item.lastRestock}</div>
-                    <div className="text-xs text-gray-500">Cost: {item.cost.toLocaleString()} KES</div>
+                    <div className="text-xs text-gray-500">
+                      Cost: {item.cost ? Number(item.cost).toLocaleString() : "N/A"} KES
+                    </div>
                   </div>
                 </div>
               ))}

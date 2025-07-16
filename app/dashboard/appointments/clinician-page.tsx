@@ -10,11 +10,33 @@ export default function ClinicianAppointmentsPage() {
   const doctorName = "Dr. Mary Gyenac";
   const [bookings, setBookings] = useState<any[]>([]);
   const [success, setSuccess] = useState("");
+  const [role, setRole] = useState("clinician"); // Default to clinician
 
   useEffect(() => {
     // Filter bookings for this gynecologist
     setBookings(bookingsData.filter((b: any) => b.doctorId === doctorId));
-  }, []);
+    // If admin, show dummy data for demo
+    if (role === "admin") {
+      setBookings([
+        {
+          id: "demo-001",
+          patientName: "Jane Doe",
+          date: "2025-07-20",
+          time: "09:00 AM",
+          status: "pending",
+          serviceType: "Consultation",
+        },
+        {
+          id: "demo-002",
+          patientName: "Alice Smith",
+          date: "2025-07-21",
+          time: "11:00 AM",
+          status: "confirmed",
+          serviceType: "Ultrasound",
+        },
+      ]);
+    }
+  }, [role]);
 
   const handleUpdateStatus = (id: string, status: string) => {
     setBookings(bookings => bookings.map(b => b.id === id ? { ...b, status } : b));
