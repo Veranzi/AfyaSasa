@@ -1,3 +1,4 @@
+'use client'
 import { Dashboard } from "@/components/dashboard"
 import RoleGuard from "@/components/RoleGuard";
 import { useEffect } from "react"

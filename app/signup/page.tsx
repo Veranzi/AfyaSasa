@@ -18,6 +18,17 @@ export default function SignupPage() {
   const [resetMessage, setResetMessage] = useState("");
   const router = useRouter();
 
+  // Helper function for role-based redirect
+  const redirectByRole = (role: string) => {
+    if (role === "clinician") {
+      router.replace("/demo");
+    } else if (role === "admin") {
+      router.replace("/dashboard");
+    } else {
+      router.replace("/dashboard/chatbot");
+    }
+  };
+
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value);
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value);
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value);
@@ -45,11 +56,7 @@ export default function SignupPage() {
       // Fetch user role
       const userDoc = await getDoc(doc(db, "users", user.uid));
       const role = userDoc.exists() ? userDoc.data().role : "patient";
-      if (role === "admin") {
-        router.replace("/dashboard");
-      } else {
-        router.replace("/dashboard/chatbot");
-      }
+      redirectByRole(role);
     } catch (err: any) {
       setError(err.message || "Authentication failed");
     } finally {
@@ -78,11 +85,7 @@ export default function SignupPage() {
       // Fetch user role
       const updatedUserDoc = await getDoc(doc(db, "users", user.uid));
       const role = updatedUserDoc.exists() ? updatedUserDoc.data().role : "patient";
-      if (role === "admin") {
-        router.replace("/dashboard");
-      } else {
-        router.replace("/dashboard/chatbot");
-      }
+      redirectByRole(role);
     } catch (err: any) {
       setError(err.message || "Google sign-in failed");
     } finally {
