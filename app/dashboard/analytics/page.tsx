@@ -54,10 +54,11 @@ export default function AnalyticsPage() {
 
   // Risk mapping
   function getRisk(rec: any) {
-    if (rec["Recommended Management"] === "Referral") return "High";
-    if (rec["Recommended Management"] === "Surgery") return "Medium";
-    if (rec["Recommended Management"] === "Medication") return "Low";
-    if (rec["Recommended Management"] === "Observation") return "Moderate";
+    const mgmt = (rec["Recommended Management"] || "").trim();
+    if (mgmt === "Referral") return "High";
+    if (mgmt === "Surgery") return "Medium";
+    if (mgmt === "Medication") return "Low";
+    if (mgmt === "Observation") return "Moderate";
     return "-";
   }
 
@@ -228,6 +229,25 @@ export default function AnalyticsPage() {
 
   const chartData = processData(patients);
 
+  // Find the most common ultrasound feature
+  let mostCommonFeature = "-";
+  let mostCommonFeatureCount = 0;
+  if (patients.length > 0) {
+    const featureCounts: Record<string, number> = {};
+    patients.forEach(p => {
+      const feature = (p["Ultrasound Features"] || "-").trim();
+      featureCounts[feature] = (featureCounts[feature] || 0) + 1;
+    });
+    const sorted = Object.entries(featureCounts).sort((a, b) => b[1] - a[1]);
+    if (sorted.length > 0) {
+      mostCommonFeature = sorted[0][0];
+      mostCommonFeatureCount = sorted[0][1];
+    }
+  }
+
+  // Calculate cost savings (example: 5000 Ksh per patient)
+  const costSavings = totalPatients * 5000;
+
   return (
     <RoleGuard allowed={["clinician", "admin"]}>
       <div className="flex-1 space-y-4 p-8 pt-6">
@@ -238,7 +258,7 @@ export default function AnalyticsPage() {
           </Button>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-6">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Patients</CardTitle>
@@ -246,9 +266,6 @@ export default function AnalyticsPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{totalPatients}</div>
-              <p className="text-xs text-muted-foreground">
-                <span className="text-green-600">Live</span>
-              </p>
             </CardContent>
           </Card>
           <Card>
@@ -258,9 +275,6 @@ export default function AnalyticsPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{predictionAccuracy}%</div>
-              <p className="text-xs text-muted-foreground">
-                <span className="text-green-600">Live</span>
-              </p>
             </CardContent>
           </Card>
           <Card>
@@ -270,9 +284,6 @@ export default function AnalyticsPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{highRiskCases}</div>
-              <p className="text-xs text-muted-foreground">
-                <span className="text-red-600">Live</span>
-              </p>
             </CardContent>
           </Card>
           <Card>
@@ -282,9 +293,26 @@ export default function AnalyticsPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{growthRate}</div>
-              <p className="text-xs text-muted-foreground">
-                <span className="text-green-600">Live</span>
-              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Cost Savings</CardTitle>
+              <Badge className="bg-green-100 text-green-800"><span role="img" aria-label="money">💰</span></Badge>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">Ksh {costSavings.toLocaleString()}</div>
+              <div className="text-xs text-muted-foreground">Estimated</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Most Common Feature</CardTitle>
+              <Badge className="bg-blue-100 text-blue-800"><span role="img" aria-label="ultrasound">🔬</span></Badge>
+            </CardHeader>
+            <CardContent>
+              <div className="text-lg font-bold">{mostCommonFeature}</div>
+              <div className="text-xs text-muted-foreground">{mostCommonFeatureCount} patient(s)</div>
             </CardContent>
           </Card>
         </div>

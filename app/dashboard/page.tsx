@@ -1,7 +1,16 @@
 import { Dashboard } from "@/components/dashboard"
 import RoleGuard from "@/components/RoleGuard";
+import { useEffect } from "react"
+import { useRouter } from "next/navigation"
 
 export default function DashboardHomePage() {
+  const router = useRouter();
+  useEffect(() => {
+    const userRole = localStorage.getItem("userRole");
+    if (userRole === "clinician") {
+      router.replace("/demo");
+    }
+  }, [router]);
   return (
     <RoleGuard allowed={["clinician", "admin"]}>
       <div className="flex-1 space-y-4 p-8 pt-6">
