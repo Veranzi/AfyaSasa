@@ -114,30 +114,6 @@ export function DashboardNav() {
   } else if (role === "clinician") {
     navLinks = [
       ...routes,
-      {
-        label: "Medical Chatbot",
-        icon: MessageCircle,
-        href: "/dashboard/chatbot",
-        color: "text-pink-600",
-      },
-      {
-        label: "Appointments",
-        icon: Calendar,
-        href: "/dashboard/appointments",
-        color: "text-blue-600",
-      },
-      {
-        label: "Reminders",
-        icon: AlarmClock,
-        href: "/dashboard/reminders",
-        color: "text-amber-600",
-      },
-      {
-        label: "Blogs",
-        icon: FileText,
-        href: "/blogs",
-        color: "text-rose-500",
-      },
     ];
   } else if (role === "admin") {
     navLinks = [
