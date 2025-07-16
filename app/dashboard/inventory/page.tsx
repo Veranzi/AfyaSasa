@@ -19,22 +19,36 @@ export default function InventoryPage() {
   const [facilityFilter, setFacilityFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
 
-  // Derive unique facilities and categories from inventory
-  const facilities = Array.from(new Set((inventory || []).map((item: any) => item.location)));
-  const categories = Array.from(new Set((inventory || []).map((item: any) => item.category)));
+  // Map Google Sheet columns to expected keys
+  const mappedInventory = (inventory || []).map((item: any) => ({
+    item: item["Item"],
+    location: item["Facility"],
+    category: item["Category"],
+    cost: item["Cost (KES)"],
+    stock: item["Available Stock"],
+    // Add more mappings if needed
+  }));
+
+  // Derive unique facilities and categories from mappedInventory
+  const facilities = Array.from(new Set(mappedInventory.map((item: any) => item.location)));
+  const categories = Array.from(new Set(mappedInventory.map((item: any) => item.category)));
 
   // Filtered inventory
-  const filteredInventory = (inventory || []).filter((item: any) =>
+  const filteredInventory = mappedInventory.filter((item: any) =>
     (!facilityFilter || item.location === facilityFilter) &&
     (!categoryFilter || item.category === categoryFilter)
   );
 
   // Calculate summary stats with loading guards
-  const totalItems = loading ? 0 : (inventory || []).length;
-  const lowStockItems = loading ? 0 : (inventory || []).filter((item: any) => item.status === "low").length;
-  const criticalItems = loading ? 0 : (inventory || []).filter((item: any) => item.status === "critical").length;
-  const restockOrders = loading ? 0 : (inventory || []).filter((item: any) => item.restock === "yes").length;
-  const inventoryValue = loading ? 0 : (inventory || []).reduce((sum: number, item: any) => sum + (parseFloat(item.cost) * parseInt(item.stock)), 0);
+  const totalItems = loading ? 0 : mappedInventory.length;
+  // Find item with highest stock (low stock items card)
+  const highestStockItem = mappedInventory.reduce((max, item) => (Number(item.stock) > Number(max.stock) ? item : max), mappedInventory[0] || {stock: 0, item: "-"});
+  // Find item with lowest stock (restock orders card)
+  const lowestStockItem = mappedInventory.reduce((min, item) => (Number(item.stock) < Number(min.stock) ? item : min), mappedInventory[0] || {stock: 0, item: "-"});
+  const lowStockItems = highestStockItem ? `${highestStockItem.item} (${highestStockItem.stock} units)` : "-";
+  const restockOrders = lowestStockItem ? `${lowestStockItem.item} (${lowestStockItem.stock} units)` : "-";
+  const criticalItems = 0; // Not available in your data
+  const inventoryValue = loading ? 0 : mappedInventory.reduce((sum: number, item: any) => sum + (parseFloat(item.cost) * parseInt(item.stock)), 0);
 
   if (loading) {
     return <div className="p-8 text-center">Loading inventory...</div>;
@@ -58,33 +72,24 @@ export default function InventoryPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{totalItems}</div>
-              <p className="text-xs text-muted-foreground">
-                <span className="text-green-600">Live</span>
-              </p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Low Stock Items</CardTitle>
-              <AlertTriangle className="h-4 w-4 text-yellow-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{lowStockItems}</div>
-              <p className="text-xs text-muted-foreground">
-                <span className="text-red-600">{criticalItems}</span> critical items
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Restock Orders</CardTitle>
+              <CardTitle className="text-sm font-medium">High Stock Item</CardTitle>
               <ArrowUpRight className="h-4 w-4 text-purple-600" />
             </CardHeader>
             <CardContent>
+              <div className="text-2xl font-bold">{lowStockItems}</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Low/Restock Item</CardTitle>
+              <AlertTriangle className="h-4 w-4 text-yellow-600" />
+            </CardHeader>
+            <CardContent>
               <div className="text-2xl font-bold">{restockOrders}</div>
-              <p className="text-xs text-muted-foreground">
-                <span className="text-green-600">Live</span> pending orders
-              </p>
             </CardContent>
           </Card>
           <Card>
@@ -94,9 +99,6 @@ export default function InventoryPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">KES {inventoryValue.toLocaleString()}</div>
-              <p className="text-xs text-muted-foreground">
-                <span className="text-green-600">Live</span> value
-              </p>
             </CardContent>
           </Card>
         </div>
@@ -152,30 +154,13 @@ export default function InventoryPage() {
                       <Package className="h-5 w-5" />
                     </div>
                     <div>
-                      <div className="font-medium text-gray-900">{item.item}</div>
-                      <div className="text-sm text-gray-600">ID: {item.id} • {item.category}</div>
+                      <div className="font-medium text-gray-900 text-base">{item.item}</div>
+                      <div className="text-sm text-gray-600">{item.category}</div>
                       <div className="text-sm text-gray-600">Location: {item.location}</div>
-                      <div className="text-sm text-gray-600">Supplier: {item.supplier}</div>
                     </div>
                   </div>
                   <div className="text-right">
-                    <Badge
-                      variant={
-                        item.status === "critical"
-                          ? "destructive"
-                          : item.status === "low"
-                          ? "default"
-                          : "secondary"
-                      }
-                      className="mb-1"
-                    >
-                      {item.stock} units
-                    </Badge>
-                    <div className="w-[200px]">
-                      <Progress value={(item.stock / (item.threshold * 4)) * 100} className="h-2" />
-                    </div>
-                    <div className="text-xs text-gray-500">Threshold: {item.threshold} units</div>
-                    <div className="text-xs text-gray-500">Last Restock: {item.lastRestock}</div>
+                    <Badge className="mb-1 text-xs">{item.stock} units</Badge>
                     <div className="text-xs text-gray-500">
                       Cost: {item.cost ? Number(item.cost).toLocaleString() : "N/A"} KES
                     </div>
