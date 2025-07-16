@@ -27,7 +27,11 @@ export default function ClinicianAppointmentsPage() {
         <h2 className="text-2xl font-bold mb-4">Clinician: Manage Appointments</h2>
         {success && <div className="text-green-600 mb-2">{success}</div>}
         {bookings.length === 0 ? (
-          <div>No bookings for you.</div>
+          <div className="flex flex-col items-center justify-center py-12">
+            <div className="text-6xl mb-4">📅</div>
+            <div className="text-gray-500 text-lg mb-2">No appointments to manage yet.</div>
+            <div className="text-gray-400">All patient bookings will appear here for review and management.</div>
+          </div>
         ) : (
           <ul className="space-y-4">
             {bookings.map((booking) => {

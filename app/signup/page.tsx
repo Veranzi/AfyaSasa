@@ -110,17 +110,14 @@ export default function SignupPage() {
       <div className="hidden md:flex flex-col justify-center items-center w-1/2 bg-gradient-to-br from-pink-500 via-purple-500 to-rose-400 text-white p-12 relative">
         <div className="absolute inset-0 bg-black/20" />
         <div className="relative z-10 flex flex-col items-center">
+          {/* Replace the logo image and previous spotlight with this: */}
           <img
             src="/AfyaSasa logo.png"
             alt="AfyaSasa Logo"
-            width={128}
-            height={128}
+            width={180}
+            height={180}
             className="object-contain rounded-2xl mb-6"
           />
-          <div className="flex items-center gap-2 mb-2">
-            <img src="/AfyaSasa logo.png" alt="AfyaSasa Logo" className="h-8 w-8 object-contain rounded-full" />
-            <h1 className="text-4xl font-extrabold tracking-tight drop-shadow-lg">AfyaSasa</h1>
-          </div>
           <p className="text-lg text-pink-100 mb-8 text-center max-w-xs">AI-powered ovarian cyst prediction and care for every woman, everywhere.</p>
           <div className="shadow-xl w-80 h-80 md:w-[28rem] md:h-[28rem] flex items-center justify-center">
             <div className="flex items-center justify-center w-full h-full">

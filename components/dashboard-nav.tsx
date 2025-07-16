@@ -115,28 +115,28 @@ export function DashboardNav() {
     navLinks = [
       ...routes,
       {
-        label: "Live Demo",
-        icon: Activity,
-        href: "/demo",
-        color: "text-pink-700",
+        label: "Medical Chatbot",
+        icon: MessageCircle,
+        href: "/dashboard/chatbot",
+        color: "text-pink-600",
       },
       {
-        label: "Manage Appointments",
+        label: "Appointments",
         icon: Calendar,
-        href: "/dashboard/appointments/clinician-page",
-        color: "text-blue-800",
+        href: "/dashboard/appointments",
+        color: "text-blue-600",
       },
       {
-        label: "Manage Reminders",
+        label: "Reminders",
         icon: AlarmClock,
-        href: "/dashboard/reminders/clinician-page",
-        color: "text-amber-800",
+        href: "/dashboard/reminders",
+        color: "text-amber-600",
       },
       {
-        label: "Manage Reports",
+        label: "Blogs",
         icon: FileText,
-        href: "/dashboard/reports/clinician-page",
-        color: "text-emerald-800",
+        href: "/blogs",
+        color: "text-rose-500",
       },
     ];
   } else if (role === "admin") {

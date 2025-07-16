@@ -37,7 +37,11 @@ export default function RemindersPage() {
             </h2>
             <div className="text-2xl mb-4">🗓️ Upcoming Appointments</div>
             {appointments.length === 0 ? (
-              <div className="text-gray-500 text-center">🔄 No more upcoming appointments.</div>
+              <div className="flex flex-col items-center justify-center py-12">
+                <div className="text-6xl mb-4">⏰</div>
+                <div className="text-gray-500 text-lg mb-2">No reminders to manage yet.</div>
+                <div className="text-gray-400">All appointment reminders will appear here for review and management.</div>
+              </div>
             ) : (
               appointments.map(appt => {
                 const formattedDate = appt.date ? new Date(appt.date).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : "-";

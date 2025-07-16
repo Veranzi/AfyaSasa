@@ -136,9 +136,6 @@ export function Header() {
                       <Link href="/dashboard/settings" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Settings</Link>
                       <Link href="/dashboard/treatment" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Treatment</Link>
                       <Link href="/dashboard/notifications" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Notifications</Link>
-                      <Link href="/dashboard/appointments/clinician-page" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Manage Appointments</Link>
-                      <Link href="/dashboard/reminders/clinician-page" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Manage Reminders</Link>
-                      <Link href="/dashboard/reports/clinician-page" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Manage Reports</Link>
                     </>
                   )}
                   {role === "admin" && (
@@ -230,9 +227,6 @@ export function Header() {
                         <Link href="/dashboard/settings" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Settings</Link>
                         <Link href="/dashboard/treatment" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Treatment</Link>
                         <Link href="/dashboard/notifications" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Notifications</Link>
-                        <Link href="/dashboard/appointments/clinician-page" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Manage Appointments</Link>
-                        <Link href="/dashboard/reminders/clinician-page" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Manage Reminders</Link>
-                        <Link href="/dashboard/reports/clinician-page" className="block px-4 py-2 text-gray-700 hover:bg-pink-50">Manage Reports</Link>
                       </>
                     )}
                     {role === "admin" && (
