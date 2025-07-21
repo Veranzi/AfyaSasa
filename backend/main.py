@@ -11,7 +11,6 @@ import base64
 from datetime import datetime
 import json
 import os
-from twilio.rest import Client
 from google.cloud import firestore
 
 load_dotenv()
@@ -45,9 +44,6 @@ else:
     ACCESS_TOKEN_URL = "https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials"
     STK_PUSH_URL = "https://api.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
 
-TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID", "AC7125dd88cb040a6736db2d0eb32fb535")
-TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN", "c535e12eb2715675a7e2171a928c6e08")
-TWILIO_PHONE_NUMBER = os.getenv("TWILIO_PHONE_NUMBER", "+254740875071")
 
 def get_mpesa_access_token():
     try:
