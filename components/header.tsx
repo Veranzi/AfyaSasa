@@ -12,22 +12,26 @@ import { useUserRole } from "@/hooks/useUserRole";
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((firebaseUser) => {
-      setUser(firebaseUser)
-    })
-    return () => unsubscribe()
-  }, [])
+      setUser(firebaseUser);
+    });
+    return () => unsubscribe();
+  }, []);
 
   const { role, loading } = useUserRole(user);
+  console.log("Header: user", user, "role", role, "loading", loading);
+
+  if (loading) return <div>Loading...</div>;
+  if (!user) return <div>Please log in</div>;
+  if (!role) return <div>No access</div>;
 
   const handleSignOut = async () => {
     await signOut(auth)
-    setUser(null)
     router.replace("/signup")
   }
 

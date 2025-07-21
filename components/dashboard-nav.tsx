@@ -16,8 +16,8 @@ import {
 import { useEffect, useState } from "react";
 import { auth } from "@/lib/firebase";
 import { useUserRole } from "@/hooks/useUserRole";
-import { MessageCircle, Calendar, AlarmClock } from "lucide-react";
 import { User } from "firebase/auth";
+import { MessageCircle, Calendar, AlarmClock } from "lucide-react";
 
 const routes = [
   {
@@ -110,10 +110,34 @@ export function DashboardNav() {
         href: "/blogs",
         color: "text-rose-500",
       },
+      {
+        label: "My Appointments",
+        icon: Calendar,
+        href: "/dashboard/appointments/patient-page",
+        color: "text-blue-700",
+      },
+      {
+        label: "Reminders",
+        icon: Bell,
+        href: "/dashboard/appointments/patient-reminders",
+        color: "text-amber-600",
+      },
     ];
   } else if (role === "clinician") {
     navLinks = [
       ...routes,
+      {
+        label: "Blogs",
+        icon: FileText,
+        href: "/blogs",
+        color: "text-rose-500",
+      },
+      {
+        label: "My Slots",
+        icon: Calendar,
+        href: "/dashboard/appointments/clinician-page",
+        color: "text-blue-800",
+      },
     ];
   } else if (role === "admin") {
     navLinks = [

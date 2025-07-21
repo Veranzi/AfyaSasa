@@ -7,6 +7,12 @@ import genai
 from fastapi.responses import JSONResponse
 import gspread
 from google.oauth2.service_account import Credentials
+import base64
+from datetime import datetime
+import json
+import os
+from twilio.rest import Client
+from google.cloud import firestore
 
 load_dotenv()
 
@@ -23,6 +29,42 @@ app.add_middleware(
 
 GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent"
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "YOUR_GEMINI_API_KEY")
+
+# M-PESA credentials
+MPESA_CONSUMER_KEY = os.getenv("MPESA_CONSUMER_KEY", "your_consumer_key")
+MPESA_CONSUMER_SECRET = os.getenv("MPESA_CONSUMER_SECRET", "your_consumer_secret")
+MPESA_PASSKEY = os.getenv("MPESA_PASSKEY", "your_passkey")
+MPESA_SHORTCODE = os.getenv("MPESA_SHORTCODE", "174379")  # Your Safaricom shortcode
+MPESA_ENV = os.getenv("MPESA_ENV", "sandbox")  # or "production"
+
+# M-PESA URLs
+if MPESA_ENV == "sandbox":
+    ACCESS_TOKEN_URL = "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials"
+    STK_PUSH_URL = "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
+else:
+    ACCESS_TOKEN_URL = "https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials"
+    STK_PUSH_URL = "https://api.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
+
+TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID", "AC7125dd88cb040a6736db2d0eb32fb535")
+TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN", "c535e12eb2715675a7e2171a928c6e08")
+TWILIO_PHONE_NUMBER = os.getenv("TWILIO_PHONE_NUMBER", "+254740875071")
+
+def get_mpesa_access_token():
+    try:
+        auth = base64.b64encode(f"{MPESA_CONSUMER_KEY}:{MPESA_CONSUMER_SECRET}".encode()).decode()
+        headers = {"Authorization": f"Basic {auth}"}
+        response = requests.get(ACCESS_TOKEN_URL, headers=headers)
+        if response.ok:
+            return response.json().get("access_token")
+        return None
+    except Exception as e:
+        print(f"Error getting access token: {e}")
+        return None
+
+def generate_password():
+    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+    password_str = f"{MPESA_SHORTCODE}{MPESA_PASSKEY}{timestamp}"
+    return base64.b64encode(password_str.encode()).decode()
 
 @app.post("/api/chat")
 async def chat(request: Request):
@@ -75,4 +117,14 @@ async def add_inventory_item(request: Request):
         data.get("Stock", "")
     ]
     worksheet.append_row(row)
-    return {"status": "success"} 
+    return {"status": "success"}
+
+@app.post("/api/payments/stk-push")
+async def stk_push(request: Request):
+    # Simulate payment success for demo/testing
+    return {
+        "success": True,
+        "CheckoutRequestID": "SIMULATED123456",
+        "ResponseCode": "0",
+        "CustomerMessage": "Simulated payment successful"
+    } 

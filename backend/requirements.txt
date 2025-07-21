@@ -6,4 +6,7 @@ Flask
 google-generativeai
 flask-cors 
 gspread
-google-auth 
+google-auth
+python-jose[cryptography]
+passlib[bcrypt]
+requests-toolbelt 
