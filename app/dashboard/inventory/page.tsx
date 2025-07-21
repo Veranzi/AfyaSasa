@@ -105,17 +105,29 @@ export default function InventoryPage() {
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                     <FormField name="Facility" control={form.control} render={({ field }) => (
                       <FormItem>
-                        <Input placeholder="Facility" {...field} />
+                        <label className="block text-xs font-semibold mb-1">Facility</label>
+                        <select className="w-full p-2 border rounded-md" {...field}>
+                          <option value="">Select Facility</option>
+                          {facilities.map(f => <option key={f} value={f}>{f}</option>)}
+                        </select>
                       </FormItem>
                     )} />
                     <FormField name="Region" control={form.control} render={({ field }) => (
                       <FormItem>
-                        <Input placeholder="Region" {...field} />
+                        <label className="block text-xs font-semibold mb-1">Region</label>
+                        <select className="w-full p-2 border rounded-md" {...field}>
+                          <option value="">Select Region</option>
+                          {regions.map(r => <option key={r} value={r}>{r}</option>)}
+                        </select>
                       </FormItem>
                     )} />
                     <FormField name="Category" control={form.control} render={({ field }) => (
                       <FormItem>
-                        <Input placeholder="Category" {...field} />
+                        <label className="block text-xs font-semibold mb-1">Category</label>
+                        <select className="w-full p-2 border rounded-md" {...field}>
+                          <option value="">Select Category</option>
+                          {categories.map(c => <option key={c} value={c}>{c}</option>)}
+                        </select>
                       </FormItem>
                     )} />
                     <FormField name="Item" control={form.control} render={({ field }) => (
