@@ -5,3 +5,5 @@ python-dotenv
 Flask
 google-generativeai
 flask-cors 
+gspread
+google-auth 

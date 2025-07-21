@@ -5,6 +5,8 @@ import os
 from dotenv import load_dotenv
 import genai
 from fastapi.responses import JSONResponse
+import gspread
+from google.oauth2.service_account import Credentials
 
 load_dotenv()
 
@@ -48,4 +50,29 @@ async def llm_recommendation(request: Request):
         response = model.generate_content(prompt)
         return {"recommendation": response.text}
     except Exception as e:
-        return JSONResponse(status_code=500, content={"recommendation": f"Error: {str(e)}"}) 
+        return JSONResponse(status_code=500, content={"recommendation": f"Error: {str(e)}"})
+
+@app.post("/api/inventory/add")
+async def add_inventory_item(request: Request):
+    data = await request.json()
+    # Path to your service account key file
+    SERVICE_ACCOUNT_FILE = "service_account.json"  # Place this file in your backend/ directory
+    SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
+    SPREADSHEET_ID = "120UNDtWijskCdvZmrCGPTzMHNrk-Yl6-"  # Inventory Google Sheet ID
+
+    creds = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+    gc = gspread.authorize(creds)
+    sh = gc.open_by_key(SPREADSHEET_ID)
+    worksheet = sh.sheet1  # or use .worksheet('SheetName') if not the first sheet
+
+    # Prepare the row in the correct order
+    row = [
+        data.get("Facility", ""),
+        data.get("Region", ""),
+        data.get("Category", ""),
+        data.get("Item", ""),
+        data.get("Cost", ""),
+        data.get("Stock", "")
+    ]
+    worksheet.append_row(row)
+    return {"status": "success"} 

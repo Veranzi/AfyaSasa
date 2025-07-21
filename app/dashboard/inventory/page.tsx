@@ -8,6 +8,9 @@ import { Progress } from "@/components/ui/progress"
 import { Search, Plus, AlertTriangle, Package, ArrowUpRight } from "lucide-react"
 import { useState } from "react";
 import RoleGuard from "@/components/RoleGuard";
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Form, FormField, FormItem } from "@/components/ui/form";
+import { useForm } from "react-hook-form";
 
 const INVENTORY_DATA_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSOrLbxUb6jmar3LIp2tFGHHimYL7Tl6zZTRNqJohoWBaq7sk0UHkxTKPwknP3muI5rx2kE6PwSyrKk/pub?gid=1858485866&single=true&output=csv";
 
@@ -18,6 +21,30 @@ export default function InventoryPage() {
   const [showFilter, setShowFilter] = useState(false);
   const [facilityFilter, setFacilityFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
+  const [showAddModal, setShowAddModal] = useState(false);
+
+  const form = useForm({
+    defaultValues: {
+      Facility: "",
+      Region: "",
+      Category: "",
+      Item: "",
+      Cost: "",
+      Stock: ""
+    }
+  });
+
+  const onSubmit = async (values: any) => {
+    // Placeholder: send to backend API
+    await fetch("/api/inventory/add", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(values)
+    });
+    setShowAddModal(false);
+    form.reset();
+    // Optionally: refresh inventory data
+  };
 
   // Map Google Sheet columns to expected keys
   const mappedInventory = (inventory || []).map((item: any) => ({
@@ -32,11 +59,14 @@ export default function InventoryPage() {
   // Derive unique facilities and categories from mappedInventory
   const facilities = Array.from(new Set(mappedInventory.map((item: any) => item.location)));
   const categories = Array.from(new Set(mappedInventory.map((item: any) => item.category)));
+  const regions = Array.from(new Set((inventory || []).map((item: any) => item["Region"])));
 
   // Filtered inventory
+  const [regionFilter, setRegionFilter] = useState("");
   const filteredInventory = mappedInventory.filter((item: any) =>
     (!facilityFilter || item.location === facilityFilter) &&
-    (!categoryFilter || item.category === categoryFilter)
+    (!categoryFilter || item.category === categoryFilter) &&
+    (!regionFilter || (inventory.find(inv => inv["Item"] === item.item && inv["Facility"] === item.location && inv["Category"] === item.category && inv["Cost (KES)"] === item.cost && inv["Available Stock"] === item.stock)?.Region === regionFilter))
   );
 
   // Calculate summary stats with loading guards
@@ -59,9 +89,58 @@ export default function InventoryPage() {
       <div className="flex-1 space-y-4 p-8 pt-6">
         <div className="flex items-center justify-between space-y-2">
           <h2 className="text-3xl font-bold tracking-tight">Inventory Management</h2>
-          <Button className="bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700">
-            <Plus className="mr-2 h-4 w-4" /> Add Item
-          </Button>
+          {/* Only show Add Item for admin */}
+          <RoleGuard allowed={["admin"]}>
+            <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
+              <DialogTrigger asChild>
+                <Button className="bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700">
+                  <Plus className="mr-2 h-4 w-4" /> Add Item
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Add Inventory Item</DialogTitle>
+                </DialogHeader>
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <FormField name="Facility" control={form.control} render={({ field }) => (
+                      <FormItem>
+                        <Input placeholder="Facility" {...field} />
+                      </FormItem>
+                    )} />
+                    <FormField name="Region" control={form.control} render={({ field }) => (
+                      <FormItem>
+                        <Input placeholder="Region" {...field} />
+                      </FormItem>
+                    )} />
+                    <FormField name="Category" control={form.control} render={({ field }) => (
+                      <FormItem>
+                        <Input placeholder="Category" {...field} />
+                      </FormItem>
+                    )} />
+                    <FormField name="Item" control={form.control} render={({ field }) => (
+                      <FormItem>
+                        <Input placeholder="Item" {...field} />
+                      </FormItem>
+                    )} />
+                    <FormField name="Cost" control={form.control} render={({ field }) => (
+                      <FormItem>
+                        <Input placeholder="Cost (KES)" type="number" step="0.01" {...field} />
+                      </FormItem>
+                    )} />
+                    <FormField name="Stock" control={form.control} render={({ field }) => (
+                      <FormItem>
+                        <Input placeholder="Available Stock" type="number" {...field} />
+                      </FormItem>
+                    )} />
+                    <DialogFooter>
+                      <Button type="submit">Add Item</Button>
+                    </DialogFooter>
+                  </form>
+                </Form>
+              </DialogContent>
+            </Dialog>
+          </RoleGuard>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -112,7 +191,7 @@ export default function InventoryPage() {
         </div>
 
         {showFilter && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
             <div>
               <label className="block text-xs font-semibold mb-1">Facility</label>
               <select 
@@ -122,6 +201,17 @@ export default function InventoryPage() {
               >
                 <option value="">All Facilities</option>
                 {facilities.map(f => <option key={f} value={f}>{f}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-semibold mb-1">Region</label>
+              <select 
+                className="w-full p-2 border rounded-md"
+                value={regionFilter}
+                onChange={e => setRegionFilter(e.target.value)}
+              >
+                <option value="">All Regions</option>
+                {regions.map(r => <option key={r} value={r}>{r}</option>)}
               </select>
             </div>
             <div>
@@ -136,7 +226,7 @@ export default function InventoryPage() {
               </select>
             </div>
             <div className="flex items-end">
-              <Button variant="secondary" onClick={() => { setFacilityFilter(""); setCategoryFilter(""); }}>Clear Filters</Button>
+              <Button variant="secondary" onClick={() => { setFacilityFilter(""); setCategoryFilter(""); setRegionFilter(""); }}>Clear Filters</Button>
             </div>
           </div>
         )}
