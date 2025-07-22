@@ -14,7 +14,9 @@ export default function SignupPage() {
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [resetMessage, setResetMessage] = useState("");
   const router = useRouter();
 
@@ -37,6 +39,11 @@ export default function SignupPage() {
     e.preventDefault();
     setLoading(true);
     setError("");
+    if (tab === "signup" && password !== confirmPassword) {
+      setError("Passwords do not match.");
+      setLoading(false);
+      return;
+    }
     try {
       let user;
       if (tab === "signup") {
@@ -108,21 +115,21 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex overflow-hidden">
-      {/* Left: Illustration/Brand */}
+    <div className="min-h-screen flex overflow-hidden bg-gradient-to-br from-pink-100 via-purple-100 to-rose-100">
+      {/* Left: Illustration/Brand (Desktop only) */}
       <div className="hidden md:flex flex-col justify-center items-center w-1/2 bg-gradient-to-br from-pink-500 via-purple-500 to-rose-400 text-white p-12 relative">
         <div className="absolute inset-0 bg-black/20" />
         <div className="relative z-10 flex flex-col items-center">
-          {/* Replace the logo image and previous spotlight with this: */}
           <img
             src="/AfyaSasa logo.png"
             alt="AfyaSasa Logo"
-            width={180}
-            height={180}
+            width={120}
+            height={120}
             className="object-contain rounded-2xl mb-6"
           />
+          <h1 className="text-3xl font-extrabold mb-2 text-white drop-shadow">AfyaSasa</h1>
           <p className="text-lg text-pink-100 mb-8 text-center max-w-xs">AI-powered ovarian cyst prediction and care for every woman, everywhere.</p>
-          <div className="shadow-xl w-80 h-80 md:w-[28rem] md:h-[28rem] flex items-center justify-center">
+          <div className="shadow-xl w-80 h-80 md:w-[22rem] md:h-[22rem] flex items-center justify-center">
             <div className="flex items-center justify-center w-full h-full">
               <svg viewBox="0 0 1 1" className="w-full h-full">
                 <defs>
@@ -147,9 +154,21 @@ export default function SignupPage() {
         </div>
       </div>
       {/* Right: Auth Card */}
-      <div className="flex-1 flex flex-col justify-center items-center bg-white px-4 py-12">
+      <div className="flex-1 flex flex-col justify-center items-center bg-transparent px-4 py-12">
         <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 border border-pink-100">
-          <div className="flex justify-center mb-6">
+          {/* Logo for mobile only */}
+          <div className="flex justify-center mb-4 md:hidden">
+            <img
+              src="/AfyaSasa logo.png"
+              alt="AfyaSasa Logo"
+              width={80}
+              height={80}
+              className="object-contain rounded-xl"
+            />
+          </div>
+          <h2 className="text-2xl font-bold text-center text-pink-600 mb-2">{tab === 'login' ? 'Welcome back!' : 'Create your account'}</h2>
+          <p className="text-center text-gray-500 mb-6">{tab === 'login' ? 'Login to access your dashboard' : 'Sign up to get started'}</p>
+          <div className="flex justify-center mb-6 gap-2">
             <button
               className={`px-6 py-2 rounded-l-lg font-semibold transition-colors ${tab === 'login' ? 'bg-pink-500 text-white' : 'bg-pink-50 text-pink-500'}`}
               onClick={() => setTab('login')}
@@ -174,10 +193,12 @@ export default function SignupPage() {
           </button>
           <form className="space-y-5" onSubmit={handleSubmit}>
             {tab === 'signup' && (
-              <div>
-                <label className="block text-sm font-medium text-pink-700 mb-1">Name</label>
-                <input type="text" className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400" placeholder="Your Name" value={name} onChange={handleNameChange} />
-              </div>
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-pink-700 mb-1">Name</label>
+                  <input type="text" className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400" placeholder="Your Name" value={name} onChange={handleNameChange} />
+                </div>
+              </>
             )}
             <div>
               <label className="block text-sm font-medium text-pink-700 mb-1">Email</label>
@@ -202,6 +223,27 @@ export default function SignupPage() {
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
+            {tab === 'signup' && (
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400 pr-10"
+                  placeholder="Confirm Password"
+                  value={confirmPassword}
+                  onChange={e => setConfirmPassword(e.target.value)}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword((v) => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+                  tabIndex={-1}
+                  aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                >
+                  {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+            )}
             {tab === 'login' && (
               <p className="text-right mt-2">
                 <button
