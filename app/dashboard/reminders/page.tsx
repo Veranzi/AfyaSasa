@@ -100,9 +100,9 @@ export default function RemindersPage() {
                       </label>
                     </div>
                     <div className="flex gap-2">
-                      <button className="bg-blue-600 text-white px-3 py-1 rounded" onClick={() => handleAddToCalendar(appt.id)}>📎 Add to Calendar</button>
-                      <button className="bg-yellow-600 text-white px-3 py-1 rounded" onClick={() => handleReschedule(appt.id)}>🔁 Reschedule</button>
-                      <button className="bg-red-600 text-white px-3 py-1 rounded" onClick={() => handleCancel(appt.id)}>❌ Cancel</button>
+                      <button className="bg-pink-600 text-white px-3 py-1 rounded font-sans" onClick={() => handleAddToCalendar(appt.id)}>📎 Add to Calendar</button>
+                      <button className="bg-purple-600 text-white px-3 py-1 rounded font-sans" onClick={() => handleReschedule(appt.id)}>🔁 Reschedule</button>
+                      <button className="bg-rose-600 text-white px-3 py-1 rounded font-sans" onClick={() => handleCancel(appt.id)}>❌ Cancel</button>
                     </div>
                   </div>
                 );
