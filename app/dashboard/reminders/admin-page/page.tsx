@@ -113,51 +113,28 @@ export default function AdminRemindersPage() {
 
   return (
     <RoleGuard allowed={["admin"]}>
-      <div className="max-w-4xl mx-auto p-8">
-        <h2 className="text-2xl font-bold mb-4">Manage Reminders</h2>
+      <div className="max-w-6xl mx-auto p-8">
+        <h2 className="text-3xl font-bold mb-6">Manage Reminders</h2>
         <input
-          className="border rounded px-3 py-2 mb-6 w-full"
+          className="border rounded px-3 py-2 mb-6 w-full text-lg"
           placeholder="Search reminders..."
           value={search}
           onChange={e => setSearch(e.target.value)}
         />
-        {feedback && <div className="mb-4 text-blue-700 font-semibold">{feedback}</div>}
+        {feedback && <div className="mb-4 text-blue-700 font-semibold text-lg">{feedback}</div>}
         {loading ? (
-          <div>Loading...</div>
+          <div className="text-lg">Loading...</div>
         ) : filteredReminders.length === 0 ? (
-          <div className="text-gray-500">No reminders found.</div>
+          <div className="text-gray-500 text-lg">No reminders found.</div>
         ) : (
           <ul className="space-y-4">
             {filteredReminders.map(rem => (
               <li key={rem.id} className="border rounded-lg p-4 bg-white flex flex-col gap-2">
-                <div><b>Recipient:</b> {rem.recipient}</div>
-                <div><b>Message:</b> {editId === rem.id ? (
-                  <input
-                    className="border rounded px-2 py-1 w-full"
-                    value={editMessage}
-                    onChange={e => setEditMessage(e.target.value)}
-                  />
-                ) : rem.message}</div>
-                <div><b>Send At:</b> {editId === rem.id ? (
-                  <input
-                    type="datetime-local"
-                    className="border rounded px-2 py-1"
-                    value={editSendAt}
-                    onChange={e => setEditSendAt(e.target.value)}
-                  />
-                ) : (rem.sendAt ? new Date(rem.sendAt.seconds ? rem.sendAt.seconds * 1000 : rem.sendAt).toLocaleString() : "-")}</div>
-                <div><b>Sent:</b> {editId === rem.id ? (
-                  <input
-                    type="checkbox"
-                    checked={editSent}
-                    onChange={e => setEditSent(e.target.checked)}
-                  />
-                ) : (rem.sent ? "Yes" : "No")}</div>
+                <div><b>Recipient:</b> {rem.patient || rem.recipient}</div>
+                <div><b>Reminder Set For:</b> {rem.sendAt ? new Date(rem.sendAt.seconds ? rem.sendAt.seconds * 1000 : rem.sendAt).toLocaleString() : "-"}</div>
+                <div><b>SMS:</b> {rem.sent ? "Yes" : "No"} | <b>Email:</b> {rem.reminderEmail ? "Yes" : "No"}</div>
                 <div className="flex flex-wrap items-center gap-2 mt-2">
-                  {/* Phone number display and copy button */}
-                  <span className="font-mono select-all text-sm">
-                    {rem.phone ? rem.phone : <span className="text-gray-400">No phone</span>}
-                  </span>
+                  <span className="font-mono select-all text-base">{rem.phone ? rem.phone : <span className="text-gray-400">No phone</span>}</span>
                   {rem.phone && (
                     <button
                       className="ml-1 px-2 py-1 text-xs bg-gray-200 rounded hover:bg-gray-300 focus:outline-none"
@@ -167,22 +144,24 @@ export default function AdminRemindersPage() {
                       {copiedPhone === rem.phone ? "Copied!" : "Copy"}
                     </button>
                   )}
-                  <button
-                    className="bg-blue-600 text-white px-3 py-1 rounded"
-                    disabled={sendingId === rem.id}
-                    onClick={() => handleSendReminder(rem)}
-                  >
-                    {sendingId === rem.id ? "Sending..." : "Send Reminder"}
-                  </button>
                   {editId === rem.id ? (
                     <>
-                      <button className="bg-green-600 text-white px-3 py-1 rounded" onClick={handleSave}>Save</button>
-                      <button className="bg-gray-400 text-white px-3 py-1 rounded" onClick={() => setEditId(null)}>Cancel</button>
+                      <button className="bg-green-600 text-white px-4 py-2 rounded mr-2" onClick={handleSave}>Save</button>
+                      <button className="bg-gray-400 text-white px-4 py-2 rounded" onClick={() => setEditId(null)}>Cancel</button>
                     </>
                   ) : (
-                    <button className="bg-yellow-600 text-white px-3 py-1 rounded" onClick={() => handleEdit(rem)}>Edit</button>
+                    <button className="bg-yellow-600 text-white px-4 py-2 rounded mr-2" onClick={() => handleEdit(rem)}>Edit</button>
                   )}
-                  <button className="bg-red-600 text-white px-3 py-1 rounded" onClick={() => handleDelete(rem.id)}>Delete</button>
+                  <button className="bg-red-600 text-white px-4 py-2 rounded mr-2" onClick={() => handleDelete(rem.id)}>Delete</button>
+                  {rem.sent ? null : (
+                    <button
+                      className="bg-blue-600 text-white px-4 py-2 rounded"
+                      disabled={sendingId === rem.id}
+                      onClick={() => handleSendReminder(rem)}
+                    >
+                      {sendingId === rem.id ? "Sending..." : "Send Reminder"}
+                    </button>
+                  )}
                 </div>
               </li>
             ))}

@@ -1,38 +1,48 @@
 "use client";
+import { useEffect, useState } from "react";
+import { db } from "@/lib/firebase";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { useUserContext } from "@/context/UserContext";
 import RoleGuard from "@/components/RoleGuard";
 
-const DUMMY_REPORTS = [
-  {
-    id: "rep-101",
-    name: "Ovarian Cyst Analysis",
-    date: "2025-07-15T10:00:00Z",
-    fileUrl: "#",
-    patient: "Jane Doe",
-  },
-  {
-    id: "rep-102",
-    name: "Follow-up Report",
-    date: "2025-07-16T14:30:00Z",
-    fileUrl: "#",
-    patient: "Alice Smith",
-  },
-];
-
 export default function ClinicianReportsPage() {
+  const { user } = useUserContext();
+  const [reports, setReports] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user) return;
+    async function fetchReports() {
+      setLoading(true);
+      const q = query(collection(db, "reports"), where("clinicianId", "==", user.uid));
+      const querySnapshot = await getDocs(q);
+      setReports(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      setLoading(false);
+    }
+    fetchReports();
+  }, [user]);
+
   return (
-    <RoleGuard allowed={["admin"]}>
+    <RoleGuard allowed={["clinician"]}>
       <div className="max-w-3xl mx-auto p-8">
-        <h2 className="text-2xl font-bold mb-4">Manage Reports (Demo)</h2>
-        <ul className="space-y-4">
-          {DUMMY_REPORTS.map((rep) => (
-            <li key={rep.id} className="border rounded-lg p-4 bg-white flex flex-col gap-2">
-              <div><b>Patient:</b> {rep.patient}</div>
-              <div><b>Report:</b> {rep.name}</div>
-              <div><b>Date:</b> {new Date(rep.date).toLocaleString()}</div>
-              <a href={rep.fileUrl} className="text-blue-600 underline">Download</a>
-            </li>
-          ))}
-        </ul>
+        <h2 className="text-2xl font-bold mb-4">My Reports</h2>
+        {loading ? (
+          <div>Loading...</div>
+        ) : reports.length === 0 ? (
+          <div className="text-gray-500">No reports found.</div>
+        ) : (
+          <ul className="space-y-4">
+            {reports.map((rep) => (
+              <li key={rep.id} className="border rounded-lg p-4 bg-white flex flex-col gap-2">
+                <div><b>Patient:</b> {rep.patientName}</div>
+                <div><b>Type:</b> {rep.type}</div>
+                <div><b>Status:</b> {rep.status}</div>
+                <div><b>Date:</b> {rep.date ? new Date(rep.date).toLocaleString() : "-"}</div>
+                <a href={rep.fileUrl} className="text-blue-600 underline">Download</a>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </RoleGuard>
   );

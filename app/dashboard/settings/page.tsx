@@ -12,11 +12,15 @@ import { db } from "@/lib/firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import React from "react";
 
+type NotifPrefs = {
+  [key: string]: boolean;
+};
+
 export default function SettingsPage() {
   const { user } = useUserContext();
   const { theme, setTheme } = useTheme();
   const [profile, setProfile] = useState({ name: "", email: "", role: "" });
-  const [notifPrefs, setNotifPrefs] = useState({
+  const [notifPrefs, setNotifPrefs] = useState<NotifPrefs>({
     patientAlerts: true,
     inventoryAlerts: true,
     treatmentAlerts: true,
