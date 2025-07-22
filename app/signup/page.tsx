@@ -120,13 +120,6 @@ export default function SignupPage() {
       <div className="hidden md:flex flex-col justify-center items-center w-1/2 bg-gradient-to-br from-pink-500 via-purple-500 to-rose-400 text-white p-12 relative">
         <div className="absolute inset-0 bg-black/20" />
         <div className="relative z-10 flex flex-col items-center">
-          <img
-            src="/AfyaSasa logo.png"
-            alt="AfyaSasa Logo"
-            width={120}
-            height={120}
-            className="object-contain rounded-2xl mb-6"
-          />
           <h1 className="text-3xl font-extrabold mb-2 text-white drop-shadow">AfyaSasa</h1>
           <p className="text-lg text-pink-100 mb-8 text-center max-w-xs">AI-powered ovarian cyst prediction and care for every woman, everywhere.</p>
           <div className="shadow-xl w-80 h-80 md:w-[22rem] md:h-[22rem] flex items-center justify-center">
@@ -156,13 +149,13 @@ export default function SignupPage() {
       {/* Right: Auth Card */}
       <div className="flex-1 flex flex-col justify-center items-center bg-transparent px-4 py-12">
         <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 border border-pink-100">
-          {/* Logo for mobile only */}
-          <div className="flex justify-center mb-4 md:hidden">
+          {/* Logo for both desktop and mobile, always at the top of the card */}
+          <div className="flex justify-center mb-4">
             <img
               src="/AfyaSasa logo.png"
               alt="AfyaSasa Logo"
-              width={80}
-              height={80}
+              width={96}
+              height={96}
               className="object-contain rounded-xl"
             />
           </div>
