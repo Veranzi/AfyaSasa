@@ -6,20 +6,32 @@ const serviceAccount = require("./serviceAccountKey.json"); // Download from Fir
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
+
 const db = admin.firestore();
 const app = express();
+
+// Middleware to parse x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
 
+// Optional: Log incoming requests
+app.use((req, res, next) => {
+  console.log("Incoming Request:", req.body);
+  next();
+});
+
+// Root endpoint
+app.get("/", (req, res) => {
+  res.send("AfyaSasa USSD Server is Running");
+});
+
+// Main USSD interaction logic
 app.post("/ussd", async (req, res) => {
   const { sessionId, phoneNumber, text } = req.body;
   let response = "";
 
-  // Split user input
   const input = text.split("*");
   const userInput = input[input.length - 1];
-
-  // Simple user role check (in production, use a real check)
-  const isClinician = phoneNumber.endsWith("000"); // e.g., +2547xxxx000 is a clinician
+  const isClinician = phoneNumber.endsWith("000");
 
   if (text === "") {
     response = "CON Welcome to AfyaSasa\n";
@@ -27,8 +39,6 @@ app.post("/ussd", async (req, res) => {
       ? "1. Add Slot\n2. View My Slots"
       : "1. Book Appointment\n2. View My Appointments";
   } else if (input[0] === "1" && !isClinician) {
-    // Patient: Book Appointment
-    // Fetch available slots
     const slotsSnap = await db.collection("slots").where("available", "==", true).limit(5).get();
     if (slotsSnap.empty) {
       response = "END No slots available. Try again later.";
@@ -41,13 +51,11 @@ app.post("/ussd", async (req, res) => {
       response += "Reply with slot number";
     }
   } else if (input[0] === "1" && isClinician) {
-    // Clinician: Add Slot
     if (input.length === 1) {
       response = "CON Enter slot date (YYYY-MM-DD):";
     } else if (input.length === 2) {
       response = "CON Enter slot time (HH:MM):";
     } else if (input.length === 3) {
-      // Save slot
       const date = input[1];
       const time = input[2];
       await db.collection("slots").add({
@@ -59,7 +67,6 @@ app.post("/ussd", async (req, res) => {
       response = "END Slot added successfully!";
     }
   } else if (input[0] === "2" && !isClinician) {
-    // Patient: View My Appointments
     const apptsSnap = await db.collection("appointments").where("patientPhone", "==", phoneNumber).get();
     if (apptsSnap.empty) {
       response = "END No appointments found.";
@@ -71,7 +78,6 @@ app.post("/ussd", async (req, res) => {
       });
     }
   } else if (input[0] === "2" && isClinician) {
-    // Clinician: View My Slots
     const slotsSnap = await db.collection("slots").where("clinicianId", "==", phoneNumber).get();
     if (slotsSnap.empty) {
       response = "END No slots found.";
@@ -83,7 +89,6 @@ app.post("/ussd", async (req, res) => {
       });
     }
   } else if (input[0] === "1" && !isClinician && input.length === 2) {
-    // Patient: Confirm booking
     const slotIdx = parseInt(userInput) - 1;
     const slotsSnap = await db.collection("slots").where("available", "==", true).limit(5).get();
     const slotDoc = slotsSnap.docs[slotIdx];
@@ -91,7 +96,6 @@ app.post("/ussd", async (req, res) => {
       response = "END Invalid slot selection.";
     } else {
       const slot = slotDoc.data();
-      // Book appointment
       await db.collection("appointments").add({
         patientPhone: phoneNumber,
         slotId: slotDoc.id,
@@ -100,7 +104,6 @@ app.post("/ussd", async (req, res) => {
         time: slot.time,
         status: "booked",
       });
-      // Mark slot as unavailable
       await db.collection("slots").doc(slotDoc.id).update({ available: false });
       response = `END Appointment booked for ${slot.date} ${slot.time}`;
     }
@@ -108,9 +111,21 @@ app.post("/ussd", async (req, res) => {
     response = "END Invalid option.";
   }
 
-  res.set("Content-Type: text/plain");
+  res.set("Content-Type", "text/plain");
   res.send(response);
 });
 
+// 🔥 NEW: Event endpoint for Africa's Talking (optional but useful)
+app.post("/ussd/event", (req, res) => {
+  const { sessionId, phoneNumber, event } = req.body;
+
+  console.log(`USSD Event Received => Event: ${event}, Phone: ${phoneNumber}, Session: ${sessionId}`);
+
+  // You can store these in Firestore for analytics/logs if needed
+
+  res.status(200).send("Event received");
+});
+
+// Start server
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`USSD server running on port ${PORT}`));
