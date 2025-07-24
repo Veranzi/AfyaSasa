@@ -44,13 +44,13 @@ const mockNotifications = [
   },
 ];
 
-const typeIcon = {
+const typeIcon: Record<string, typeof Info> = {
   info: Info,
   warning: AlertTriangle,
   success: CheckCircle,
   error: XCircle,
 };
-const typeColor = {
+const typeColor: Record<string, string> = {
   info: "bg-blue-100 text-blue-700",
   warning: "bg-yellow-100 text-yellow-700",
   success: "bg-green-100 text-green-700",

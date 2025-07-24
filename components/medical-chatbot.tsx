@@ -1,9 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
 import { auth } from "@/lib/firebase";
+import ReactMarkdown from 'react-markdown';
+import { type ReactMarkdownProps } from 'react-markdown';
 
 export default function MedicalChatbot() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<any>(null);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([
     { role: "assistant", content: "Hello! I'm your medical assistant. How can I help you today?" }
@@ -22,13 +24,13 @@ export default function MedicalChatbot() {
     setMessages((msgs) => [...msgs, { role: "user", content: input }]);
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:8000/api/chat", {
+      const res = await fetch("https://afyasasa-llm.onrender.com/ask", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: input }),
+        body: JSON.stringify({ query: input }),
       });
       const data = await res.json();
-      setMessages((msgs) => [...msgs, { role: "user", content: input }, { role: "assistant", content: data.candidates?.[0]?.content?.parts?.[0]?.text || data.response || "Sorry, I couldn't understand that." }]);
+      setMessages((msgs) => [...msgs, { role: "user", content: input }, { role: "assistant", content: data.answer?.replaceAll("\n", "\n") || "Sorry, I couldn't understand that." }]);
       setInput("");
     } catch (e) {
       setMessages((msgs) => [...msgs, { role: "assistant", content: "Sorry, there was an error connecting to the chatbot." }]);

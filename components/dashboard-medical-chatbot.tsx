@@ -1,6 +1,8 @@
 "use client";
 import { useState } from "react";
 import Image from "next/image";
+import ReactMarkdown from 'react-markdown';
+import { type ReactMarkdownProps } from 'react-markdown';
 
 export default function DashboardMedicalChatbot() {
   const [messages, setMessages] = useState([
@@ -33,14 +35,14 @@ export default function DashboardMedicalChatbot() {
     try {
       // Show 'thinking...' before fetching
       await new Promise(resolve => setTimeout(resolve, 600)); // short delay for effect
-      const res = await fetch("https://veranziverah.app.modelbit.com/v1/ovarian_cyst_knowledge_assistant/latest", {
+      const res = await fetch("https://afyasasa-llm.onrender.com/ask", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ data: currentInput }),
+        body: JSON.stringify({ query: currentInput }),
       });
       const data = await res.json();
       if (res.ok) {
-        const responseText = data.data?.answer?.replaceAll("\n", "\n") || "No answer found.";
+        const responseText = data.answer?.replaceAll("\n", "\n") || "No answer found.";
         setMessages(prev => [...prev, { role: "assistant", content: responseText }]);
       } else {
         setMessages(prev => [...prev, { role: "assistant", content: "I apologize, but I encountered an error. Please try again." }]);

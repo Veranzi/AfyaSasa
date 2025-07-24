@@ -148,7 +148,7 @@ export default function ClinicianSlotsPage() {
           <select
             className="w-full p-2 border rounded-md"
             value={facilityFilter}
-            onChange={e => setFacilityFilter(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFacilityFilter(e.target.value)}
           >
             <option value="">All Facilities</option>
             {FACILITIES.map(f => <option key={f} value={f}>{f}</option>)}
@@ -160,13 +160,13 @@ export default function ClinicianSlotsPage() {
           <select
             className="w-full p-2 border rounded-md"
             value={facilityInput}
-            onChange={e => setFacilityInput(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFacilityInput(e.target.value)}
           >
             <option value="">Select Facility</option>
             {FACILITIES.map(f => <option key={f} value={f}>{f}</option>)}
           </select>
-          <Input type="date" value={date} onChange={e => setDate(e.target.value)} />
-          <Input type="time" value={time} onChange={e => setTime(e.target.value)} />
+          <Input type="date" value={date} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDate(e.target.value)} />
+          <Input type="time" value={time} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTime(e.target.value)} />
           <Button onClick={handleAddSlot} disabled={!facilityInput}>Add Slot</Button>
         </div>
         {/* Table of slots */}
@@ -184,16 +184,16 @@ export default function ClinicianSlotsPage() {
               {filteredSlots.length === 0 && (
                 <tr><td colSpan={4} className="text-center py-4">No slots yet.</td></tr>
               )}
-              {filteredSlots.map(slot => (
+              {filteredSlots.map((slot: { id: string; facility: string; date: string; time: string }) => (
                 <tr key={slot.id} className="border-b">
                   {editingSlotId === slot.id ? (
                     <>
                       <td className="px-4 py-2">{slot.facility}</td>
                       <td className="px-4 py-2">
-                        <Input type="date" value={editDate} onChange={e => setEditDate(e.target.value)} className="w-32" />
+                        <Input type="date" value={editDate} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditDate(e.target.value)} className="w-32" />
                       </td>
                       <td className="px-4 py-2">
-                        <Input type="time" value={editTime} onChange={e => setEditTime(e.target.value)} className="w-24" />
+                        <Input type="time" value={editTime} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditTime(e.target.value)} className="w-24" />
                       </td>
                       <td className="px-4 py-2 flex gap-2">
                         <Button size="sm" onClick={() => handleSaveEdit(slot.id)}>Save</Button>

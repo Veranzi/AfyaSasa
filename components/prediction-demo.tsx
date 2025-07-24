@@ -12,6 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { useGoogleSheet } from "@/hooks/useGoogleSheet"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import React, { useRef } from "react"
+import ReactMarkdown from 'react-markdown';
 
 const OVARIAN_DATA_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSOrLbxUb6jmar3LIp2tFGHHimYL7Tl6zZTRNqJohoWBaq7sk0UHkxTKPwknP3muI5rx2kE6PwSyrKk/pub?gid=0&single=true&output=csv";
 
@@ -142,7 +143,7 @@ export function PredictionDemo() {
         if (probabilities && typeof probabilities === 'object') {
           probText = "Probabilities:\n";
           for (const [label, prob] of Object.entries(probabilities)) {
-            probText += `- ${label}: ${(prob * 100).toFixed(2)}%\n`;
+            probText += `- ${label}: ${((prob as number) * 100).toFixed(2)}%\n`;
           }
         }
         setResult(
@@ -189,14 +190,14 @@ export function PredictionDemo() {
     setUserInput("");
     setIsLoadingChat(true);
     try {
-      const res = await fetch("https://veranziverah.app.modelbit.com/v1/ovarian_cyst_knowledge_assistant/latest", {
+      const res = await fetch("https://afyasasa-llm.onrender.com/ask", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ data: currentInput }),
+        body: JSON.stringify({ query: currentInput }),
       });
       const data = await res.json();
       if (res.ok) {
-        const responseText = data.data?.answer?.replaceAll("\n", "\n") || "No answer found.";
+        const responseText = data.answer?.replaceAll("\n", "\n") || "No answer found.";
         setMessages(prev => [...prev, { role: "assistant", content: responseText }]);
       } else {
         setMessages(prev => [...prev, { role: "assistant", content: "I apologize, but I encountered an error. Please try again." }]);
