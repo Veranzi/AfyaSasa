@@ -48,7 +48,7 @@ export default function MedicalChatbot() {
         {messages.map((msg, idx) => (
           <div key={idx} className={msg.role === "user" ? "text-right" : "text-left"}>
             <span className={msg.role === "user" ? "bg-pink-200 text-pink-900 px-3 py-1 rounded-lg inline-block" : "bg-white text-gray-900 px-3 py-1 rounded-lg inline-block border"}>
-              <b>{msg.role === "user" ? "You" : "Bot"}:</b> {msg.content}
+              <b>{msg.role === "user" ? "You" : "Bot"}:</b> <pre className="whitespace-pre-wrap inline">{msg.content}</pre>
             </span>
           </div>
         ))}

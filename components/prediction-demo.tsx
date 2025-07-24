@@ -12,7 +12,6 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { useGoogleSheet } from "@/hooks/useGoogleSheet"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import React, { useRef } from "react"
-import ReactMarkdown from 'react-markdown';
 
 const OVARIAN_DATA_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSOrLbxUb6jmar3LIp2tFGHHimYL7Tl6zZTRNqJohoWBaq7sk0UHkxTKPwknP3muI5rx2kE6PwSyrKk/pub?gid=0&single=true&output=csv";
 
@@ -115,68 +114,68 @@ export function PredictionDemo() {
     }
     setLoading(true)
     const payload = {
-      data: [
-        age,
-        menopause,
-        size,
-        growth,
-        ca125,
-        ultrasound,
-        symptoms.join(", ")
-      ]
-    }
+      age,
+      menopause_status: menopause,
+      cyst_size_cm: size,
+      cyst_growth_rate: growth,
+      ca125_level: ca125,
+      ultrasound_features: ultrasound,
+      symptoms: symptoms.join(", ")
+    };
     try {
-      const response = await fetch("https://veranziverah.app.modelbit.com/v1/predict_ovarian_cyst_managementt/latest", {
+      const response = await fetch("https://afyasasa-llm.onrender.com/predict-management", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
-      })
-      const data = await response.json()
-      if (data.data) {
-        const { predicted_class, confidence_percent, interpretation, probabilities, llm_report } = data.data;
-        setPredictedClass(predicted_class);
-        setConfidencePercent(confidence_percent);
-        setInterpretation(interpretation);
-        setLlmReport(llm_report);
-        setProbabilities(probabilities);
+      });
+      const data = await response.json();
+      if (data.interpretation) {
+        setPredictedClass(data.predicted_class);
+        setConfidencePercent(data.confidence);
+        setProbabilities(data.probabilities);
+        setInterpretation(data.interpretation);
         let probText = "";
-        if (probabilities && typeof probabilities === 'object') {
+        if (data.probabilities && typeof data.probabilities === 'object') {
           probText = "Probabilities:\n";
-          for (const [label, prob] of Object.entries(probabilities)) {
+          for (const [label, prob] of Object.entries(data.probabilities)) {
             probText += `- ${label}: ${((prob as number) * 100).toFixed(2)}%\n`;
           }
         }
         setResult(
-          `Prediction: ${predicted_class}\n` +
-          `Confidence: ${confidence_percent}%\n\n` +
-          `${interpretation ? interpretation.split(". ")[0] + ".\n\n" : ""}` + // show only first sentence
+          `Prediction: ${data.predicted_class}\n` +
+          `Confidence: ${data.confidence}%\n\n` +
           probText
         );
+      } else if (data.predicted_class) {
+        setResult(`Prediction: ${data.predicted_class} (Confidence: ${data.confidence}%)`);
       } else {
-        setResult("Error: No prediction returned.")
+        setResult("Error: No prediction returned.");
       }
     } catch (error: unknown) {
       setResult("Error: " + (error instanceof Error ? error.message : String(error)));
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
   const handleFollowup = async () => {
     setFollowupResponse("");
-    if (!predictedClass || !confidencePercent) {
+    if (!result) {
       setFollowupResponse("Run prediction first.");
       return;
     }
-    const payload = { data: [predictedClass, confidencePercent, followupQuestion] };
+    const payload = {
+      previous_context: result,
+      question: followupQuestion
+    };
     try {
-      const response = await fetch("https://veranziverah.app.modelbit.com/v1/interpret_and_follow_up/latest", {
+      const response = await fetch("https://afyasasa-llm.onrender.com/follow-up", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
-      const result = await response.json();
-      setFollowupResponse(result.data?.data?.followup || "No answer returned.");
+      const data = await response.json();
+      setFollowupResponse(data.response || "No answer returned.");
     } catch (error) {
       setFollowupResponse("Error: " + (error instanceof Error ? error.message : String(error)));
     }
@@ -407,7 +406,7 @@ export function PredictionDemo() {
                     <div className="result-container mt-8 p-6 rounded-lg bg-pink-50 border-l-4 border-pink-400 w-full">
                       <h3 className="result-title text-lg font-bold flex items-center gap-2 text-pink-700 mb-2">Prediction Result</h3>
                       <pre className="result-content text-pink-700 text-xl font-semibold whitespace-pre-wrap">{result}</pre>
-                      {(interpretation || llmReport) && (
+                      {interpretation && (
                         <button className="mt-4 underline text-pink-700 hover:text-pink-900" onClick={() => setActiveTab('explanation')}>
                           See Explanation
                         </button>
@@ -483,7 +482,7 @@ export function PredictionDemo() {
                   <div className="chat-messages h-80 md:h-96 p-2 sm:p-4 overflow-y-auto bg-[#fff0f6] w-full">
                     {messages.map((message, idx) => (
                       <div key={idx} className={`message mb-4 p-4 rounded-lg max-w-[80%] ${message.role === 'user' ? 'bg-gradient-to-r from-pink-600 to-rose-600 text-white ml-auto rounded-br-none' : 'bg-white text-pink-900 mr-auto rounded-bl-none border border-pink-100'}`}>
-                        {message.content}
+                        <pre className="whitespace-pre-wrap inline">{message.content}</pre>
                       </div>
                     ))}
                     {isLoadingChat && (

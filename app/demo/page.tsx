@@ -2,10 +2,11 @@
 
 import { Header } from "@/components/header"
 import { PredictionDemo } from "@/components/prediction-demo"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { auth } from "@/lib/firebase"
 import RoleGuard from "@/components/RoleGuard";
+import DashboardMedicalChatbot from "@/components/dashboard-medical-chatbot";
 
 export default function DemoPage() {
   const router = useRouter()
@@ -17,6 +18,8 @@ export default function DemoPage() {
     })
     return () => unsubscribe()
   }, [router])
+
+  const [activeTab, setActiveTab] = useState<'chatbot' | 'prediction'>("chatbot");
 
   return (
     <RoleGuard allowed={["clinician", "admin"]}>
