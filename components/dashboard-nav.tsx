@@ -87,31 +87,25 @@ export function DashboardNav() {
   } else if (role === "patient") {
     navLinks = [
       {
+        label: "Profile",
+        icon: LayoutDashboard,
+        href: "/dashboard/profile",
+        color: "text-sky-500",
+      },
+      {
         label: "Medical Chatbot",
         icon: MessageCircle,
         href: "/dashboard/chatbot",
         color: "text-pink-600",
       },
       {
-        label: "Appointments",
+        label: "Book Appointment",
         icon: Calendar,
         href: "/dashboard/appointments",
         color: "text-blue-600",
       },
       {
-        label: "Reminders",
-        icon: AlarmClock,
-        href: "/dashboard/reminders",
-        color: "text-amber-600",
-      },
-      {
-        label: "Blogs",
-        icon: FileText,
-        href: "/blogs",
-        color: "text-rose-500",
-      },
-      {
-        label: "My Appointments",
+        label: "View Appointments",
         icon: Calendar,
         href: "/dashboard/appointments/patient-page",
         color: "text-blue-700",
@@ -121,6 +115,12 @@ export function DashboardNav() {
         icon: Bell,
         href: "/dashboard/appointments/patient-reminders",
         color: "text-amber-600",
+      },
+      {
+        label: "Blogs",
+        icon: FileText,
+        href: "/blogs",
+        color: "text-rose-500",
       },
     ];
   } else if (role === "clinician") {
@@ -153,12 +153,6 @@ export function DashboardNav() {
         icon: Calendar,
         href: "/dashboard/appointments",
         color: "text-blue-600",
-      },
-      {
-        label: "Reminders",
-        icon: AlarmClock,
-        href: "/dashboard/reminders",
-        color: "text-amber-600",
       },
       {
         label: "Blogs",

@@ -5,11 +5,13 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import RoleGuard from "@/components/RoleGuard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useUserRole } from "@/hooks/useUserRole";
 
 export default function PatientRemindersPage() {
   const [reminders, setReminders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const { role } = useUserRole(auth.currentUser);
 
   useEffect(() => {
     const fetchReminders = async () => {
@@ -35,28 +37,41 @@ export default function PatientRemindersPage() {
   }, []);
 
   return (
-    <RoleGuard allowed={["patient"]}>
+    <RoleGuard allowed={["patient", "admin"]}>
       <div className="max-w-2xl mx-auto p-8">
         <h2 className="text-2xl font-bold mb-4">My Reminders</h2>
-        {loading ? (
+        {role === "admin" ? (
+          <div className="text-lg text-center text-gray-500 mt-12">Admins do not have a personal reminders page. Please use <b>Manage Reminders</b> from the sidebar.</div>
+        ) : loading ? (
           <div>Loading...</div>
         ) : error ? (
           <div className="text-red-600">{error}</div>
         ) : reminders.length === 0 ? (
           <div>No reminders found.</div>
         ) : (
-          <div className="space-y-4">
-            {reminders.map(rem => (
-              <Card key={rem.id}>
-                <CardHeader>
-                  <CardTitle>{rem.message}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-sm text-gray-500">Scheduled: {rem.sendAt?.toDate?.().toLocaleString?.() || String(rem.sendAt)}</div>
-                  <div className="text-xs text-gray-400">Status: {rem.sent ? "Sent" : "Pending"}</div>
-                </CardContent>
-              </Card>
-            ))}
+          <div className="overflow-x-auto">
+            <table className="w-full border rounded-lg bg-white shadow">
+              <thead className="bg-pink-100">
+                <tr>
+                  <th className="px-4 py-2 border">Message</th>
+                  <th className="px-4 py-2 border">Scheduled</th>
+                  <th className="px-4 py-2 border">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {reminders.map(rem => (
+                  <tr key={rem.id} className="hover:bg-pink-50 transition">
+                    <td className="px-4 py-2 border font-medium">{rem.message}</td>
+                    <td className="px-4 py-2 border text-gray-500">{rem.sendAt?.toDate?.().toLocaleString?.() || String(rem.sendAt)}</td>
+                    <td className="px-4 py-2 border text-xs">
+                      <span className={rem.sent ? "text-green-600 font-semibold" : "text-yellow-600 font-semibold"}>
+                        {rem.sent ? "Sent" : "Pending"}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </div>

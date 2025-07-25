@@ -4,6 +4,7 @@ import { db } from "@/lib/firebase";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { useUserContext } from "@/context/UserContext";
 import RoleGuard from "@/components/RoleGuard";
+import { CreateReportForm } from "../page";
 
 export default function ClinicianReportsPage() {
   const { user } = useUserContext();
@@ -26,10 +27,26 @@ export default function ClinicianReportsPage() {
     <RoleGuard allowed={["clinician"]}>
       <div className="max-w-3xl mx-auto p-8">
         <h2 className="text-2xl font-bold mb-4">My Reports</h2>
+        <CreateReportForm
+          onReportCreated={() => {
+            // Refetch reports after creating a new one
+            if (user) {
+              const fetchReports = async () => {
+                setLoading(true);
+                const q = query(collection(db, "reports"), where("clinicianId", "==", user.uid));
+                const querySnapshot = await getDocs(q);
+                setReports(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+                setLoading(false);
+              };
+              fetchReports();
+            }
+          }}
+          filterPrintsByPrintedBy={user?.email}
+        />
         {loading ? (
           <div>Loading...</div>
         ) : reports.length === 0 ? (
-          <div className="text-gray-500">No reports found.</div>
+          <div className="text-gray-500">No reports yet.</div>
         ) : (
           <ul className="space-y-4">
             {reports.map((rep) => (

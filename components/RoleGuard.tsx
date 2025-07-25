@@ -15,7 +15,8 @@ export default function RoleGuard({ allowed, children }: { allowed: string[]; ch
   }, []);
 
   if (loading || !user) return <div>Loading...</div>;
-  if (!allowed.includes(role)) {
+  if (!role || !allowed.includes(role)) {
+    console.log("RoleGuard: Access Denied", { role, allowed });
     // Optionally, you can redirect:
     // router.replace("/dashboard");
     return <div className="p-8 text-center text-red-600 font-bold">Access Denied</div>;

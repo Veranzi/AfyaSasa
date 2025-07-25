@@ -12,6 +12,9 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { useGoogleSheet } from "@/hooks/useGoogleSheet"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import React, { useRef } from "react"
+import { db } from "@/lib/firebase";
+import { collection, addDoc } from "firebase/firestore";
+import { useUserContext } from "@/context/UserContext";
 
 const OVARIAN_DATA_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSOrLbxUb6jmar3LIp2tFGHHimYL7Tl6zZTRNqJohoWBaq7sk0UHkxTKPwknP3muI5rx2kE6PwSyrKk/pub?gid=0&single=true&output=csv";
 
@@ -75,6 +78,7 @@ export function PredictionDemo() {
   const [patientId, setPatientId] = useState("");
   const printRef = useRef<HTMLDivElement>(null);
   const [othersSymptom, setOthersSymptom] = useState(false);
+  const { user } = useUserContext();
 
   // Helper for rendering probabilities safely
   const probabilityEntries: [string, number][] = probabilities
@@ -207,6 +211,34 @@ export function PredictionDemo() {
       setIsLoadingChat(false);
     }
   }
+
+  // Add this function to save print/report record
+  const handlePrintAndSave = async () => {
+    const printContents = document.getElementById('print-section')?.innerHTML;
+    const originalContents = document.body.innerHTML;
+    // Save to Firestore
+    if (user && patientId) {
+      try {
+        await addDoc(collection(db, "prints"), {
+          clinicianId: user.uid,
+          patientId: patientId,
+          timestamp: new Date().toISOString(),
+          reportType: "Ovarian Cyst Management",
+          summary: interpretation || result || "",
+          printedBy: user.email || "clinician"
+        });
+      } catch (e) {
+        console.error("Error saving print record:", e);
+      }
+    }
+    // Print logic
+    if (printContents) {
+      document.body.innerHTML = printContents;
+      window.print();
+      document.body.innerHTML = originalContents;
+      window.location.reload();
+    }
+  };
 
   return (
     <section className="py-10 min-h-screen bg-gradient-to-br from-[#f5f7fa] to-[#ffe4ef] font-sans">
@@ -423,16 +455,7 @@ export function PredictionDemo() {
                   </div>
                   <button
                     className="mb-4 ml-auto block bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white font-bold py-2 px-6 rounded-lg shadow-lg print:hidden"
-                    onClick={() => {
-                      const printContents = document.getElementById('print-section')?.innerHTML;
-                      const originalContents = document.body.innerHTML;
-                      if (printContents) {
-                        document.body.innerHTML = printContents;
-                        window.print();
-                        document.body.innerHTML = originalContents;
-                        window.location.reload();
-                      }
-                    }}
+                    onClick={handlePrintAndSave}
                   >
                     Print
                   </button>

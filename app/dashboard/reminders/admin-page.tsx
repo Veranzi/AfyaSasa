@@ -113,7 +113,7 @@ export default function AdminRemindersPage() {
 
   return (
     <RoleGuard allowed={["admin"]}>
-      <div className="w-full h-full px-0 py-8 min-w-0 max-w-none">
+      <div className="max-w-6xl mx-auto p-8">
         <h2 className="text-3xl font-bold mb-6">Manage Reminders</h2>
         <input
           className="border rounded px-3 py-2 mb-6 w-full text-lg"
@@ -127,74 +127,45 @@ export default function AdminRemindersPage() {
         ) : filteredReminders.length === 0 ? (
           <div className="text-gray-500 text-lg">No reminders found.</div>
         ) : (
-          <div className="overflow-x-auto w-full min-w-0 max-w-none pr-8">
-            <table className="w-full min-w-[1600px] max-w-none rounded-lg bg-white shadow">
-              <thead className="bg-pink-100">
-                <tr>
-                  <th className="px-4 py-2 border">Recipient</th>
-                  <th className="px-4 py-2 border">Reminder Set For</th>
-                  <th className="px-4 py-2 border min-w-[600px] max-w-[900px]">Message</th>
-                  <th className="px-4 py-2 border">SMS</th>
-                  <th className="px-4 py-2 border">Email</th>
-                  <th className="px-4 py-2 border">Phone</th>
-                  <th className="px-4 py-2 border min-w-[220px] max-w-[320px]">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredReminders.map(rem => (
-                  <tr key={rem.id} className="hover:bg-pink-50 transition">
-                    <td className="px-4 py-2 border">{rem.patient || rem.recipient}</td>
-                    <td className="px-4 py-2 border">{rem.sendAt ? new Date(rem.sendAt.seconds ? rem.sendAt.seconds * 1000 : rem.sendAt).toLocaleString() : "-"}</td>
-                    <td className="px-4 py-2 border min-w-[600px] max-w-[900px] break-words">
-                      {editId === rem.id ? (
-                        <input
-                          className="border rounded px-2 py-1 w-full"
-                          value={editMessage}
-                          onChange={e => setEditMessage(e.target.value)}
-                        />
-                      ) : (
-                        rem.message
-                      )}
-                    </td>
-                    <td className="px-4 py-2 border">{rem.sent ? "Yes" : "No"}</td>
-                    <td className="px-4 py-2 border">{rem.reminderEmail ? "Yes" : "No"}</td>
-                    <td className="px-4 py-2 border">
-                      <span className="font-mono select-all text-base">{rem.phone ? rem.phone : <span className="text-gray-400">No phone</span>}</span>
-                      {rem.phone && (
-                        <button
-                          className="ml-1 px-2 py-1 text-xs bg-gray-200 rounded hover:bg-gray-300 focus:outline-none"
-                          onClick={() => handleCopyPhone(rem.phone)}
-                          title="Copy phone number"
-                        >
-                          {copiedPhone === rem.phone ? "Copied!" : "Copy"}
-                        </button>
-                      )}
-                    </td>
-                    <td className="px-4 py-2 border min-w-[220px] max-w-[320px] flex flex-wrap gap-2">
-                      {editId === rem.id ? (
-                        <>
-                          <button className="bg-green-600 text-white px-3 py-1 rounded mr-2" onClick={handleSave}>Save</button>
-                          <button className="bg-gray-400 text-white px-3 py-1 rounded" onClick={() => setEditId(null)}>Cancel</button>
-                        </>
-                      ) : (
-                        <button className="bg-yellow-600 text-white px-3 py-1 rounded mr-2" onClick={() => handleEdit(rem)}>Edit</button>
-                      )}
-                      <button className="bg-red-600 text-white px-3 py-1 rounded mr-2" onClick={() => handleDelete(rem.id)}>Delete</button>
-                      {rem.sent ? null : (
-                        <button
-                          className="bg-blue-600 text-white px-3 py-1 rounded"
-                          disabled={sendingId === rem.id}
-                          onClick={() => handleSendReminder(rem)}
-                        >
-                          {sendingId === rem.id ? "Sending..." : "Send Reminder"}
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <ul className="space-y-4">
+            {filteredReminders.map(rem => (
+              <li key={rem.id} className="border rounded-lg p-4 bg-white flex flex-col gap-2">
+                <div><b>Recipient:</b> {rem.patient || rem.recipient}</div>
+                <div><b>Reminder Set For:</b> {rem.sendAt ? new Date(rem.sendAt.seconds ? rem.sendAt.seconds * 1000 : rem.sendAt).toLocaleString() : "-"}</div>
+                <div><b>SMS:</b> {rem.sent ? "Yes" : "No"} | <b>Email:</b> {rem.reminderEmail ? "Yes" : "No"}</div>
+                <div className="flex flex-wrap items-center gap-2 mt-2">
+                  <span className="font-mono select-all text-base">{rem.phone ? rem.phone : <span className="text-gray-400">No phone</span>}</span>
+                  {rem.phone && (
+                    <button
+                      className="ml-1 px-2 py-1 text-xs bg-gray-200 rounded hover:bg-gray-300 focus:outline-none"
+                      onClick={() => handleCopyPhone(rem.phone)}
+                      title="Copy phone number"
+                    >
+                      {copiedPhone === rem.phone ? "Copied!" : "Copy"}
+                    </button>
+                  )}
+                  {editId === rem.id ? (
+                    <>
+                      <button className="bg-green-600 text-white px-4 py-2 rounded mr-2" onClick={handleSave}>Save</button>
+                      <button className="bg-gray-400 text-white px-4 py-2 rounded" onClick={() => setEditId(null)}>Cancel</button>
+                    </>
+                  ) : (
+                    <button className="bg-yellow-600 text-white px-4 py-2 rounded mr-2" onClick={() => handleEdit(rem)}>Edit</button>
+                  )}
+                  <button className="bg-red-600 text-white px-4 py-2 rounded mr-2" onClick={() => handleDelete(rem.id)}>Delete</button>
+                  {rem.sent ? null : (
+                    <button
+                      className="bg-blue-600 text-white px-4 py-2 rounded"
+                      disabled={sendingId === rem.id}
+                      onClick={() => handleSendReminder(rem)}
+                    >
+                      {sendingId === rem.id ? "Sending..." : "Send Reminder"}
+                    </button>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
         )}
       </div>
     </RoleGuard>

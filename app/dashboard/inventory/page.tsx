@@ -6,16 +6,20 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Progress } from "@/components/ui/progress"
 import { Search, Plus, AlertTriangle, Package, ArrowUpRight } from "lucide-react"
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import RoleGuard from "@/components/RoleGuard";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Form, FormField, FormItem } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
+import { useUserRole } from "@/hooks/useUserRole";
+import { auth } from "@/lib/firebase";
 
 const INVENTORY_DATA_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSOrLbxUb6jmar3LIp2tFGHHimYL7Tl6zZTRNqJohoWBaq7sk0UHkxTKPwknP3muI5rx2kE6PwSyrKk/pub?gid=1858485866&single=true&output=csv";
 
 export default function InventoryPage() {
   const { data: inventory, loading } = useGoogleSheet(INVENTORY_DATA_CSV);
+  const [user, setUser] = useState<any>(null);
+  const { role, loading: roleLoading } = useUserRole(user);
 
   // Add missing state for showFilter and filters
   const [showFilter, setShowFilter] = useState(false);
@@ -80,6 +84,11 @@ export default function InventoryPage() {
   const criticalItems = 0; // Not available in your data
   const inventoryValue = loading ? 0 : mappedInventory.reduce((sum: number, item: any) => sum + (parseFloat(item.cost) * parseInt(item.stock)), 0);
 
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(setUser);
+    return () => unsubscribe();
+  }, []);
+
   if (loading) {
     return <div className="p-8 text-center">Loading inventory...</div>;
   }
@@ -90,7 +99,7 @@ export default function InventoryPage() {
         <div className="flex items-center justify-between space-y-2">
           <h2 className="text-3xl font-bold tracking-tight">Inventory Management</h2>
           {/* Only show Add Item for admin */}
-          <RoleGuard allowed={["admin"]}>
+          {role === "admin" && (
             <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
               <DialogTrigger asChild>
                 <Button className="bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700">
@@ -152,7 +161,7 @@ export default function InventoryPage() {
                 </Form>
               </DialogContent>
             </Dialog>
-          </RoleGuard>
+          )}
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
