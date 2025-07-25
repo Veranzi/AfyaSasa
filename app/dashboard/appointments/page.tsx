@@ -46,7 +46,7 @@ export default function PatientAppointmentsPage() {
 
   if (showConfirmation) {
     return (
-      <div className="max-w-3xl mx-auto p-8">
+      <div className="max-w-3xl mx-auto p-8 bg-gray-50 min-h-screen">
         <div className="bg-green-50 border border-green-200 rounded-xl p-8 text-center">
           <h2 className="text-2xl font-bold text-green-800 mb-4">Appointment Booked!</h2>
           <div className="mb-4">

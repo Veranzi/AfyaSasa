@@ -188,8 +188,8 @@ export function DashboardNav() {
   }
 
   return (
-    <div className="space-y-4 py-4 flex flex-col h-full bg-white text-gray-900">
-      <div className="px-3 py-2 flex-1">
+    <div className="space-y-4 py-4 flex flex-col h-full text-gray-900">
+      <div className="px-3 py-2 flex-1 bg-white rounded-xl shadow-sm">
         <div className="space-y-1">
           {navLinks.map((route) => (
             <Link

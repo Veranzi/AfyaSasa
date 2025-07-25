@@ -38,7 +38,7 @@ export default function PatientRemindersPage() {
 
   return (
     <RoleGuard allowed={["patient", "admin"]}>
-      <div className="max-w-2xl mx-auto p-8">
+      <div className="max-w-3xl mx-auto p-8 bg-gray-50 min-h-screen">
         <h2 className="text-2xl font-bold mb-4">My Reminders</h2>
         {role === "admin" ? (
           <div className="text-lg text-center text-gray-500 mt-12">Admins do not have a personal reminders page. Please use <b>Manage Reminders</b> from the sidebar.</div>
